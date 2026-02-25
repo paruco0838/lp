@@ -316,6 +316,7 @@ a {
     font-weight: 900;
     margin-right: 15px;
     font-size: 1.4rem;
+    flex-shrink: 0;
 }
 
 .empathy-conclusion {
