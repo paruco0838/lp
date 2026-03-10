@@ -150,6 +150,19 @@ a {
     color: var(--color-white);
 }
 
+/* インスタグラム用ボタン */
+.btn-insta {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: var(--color-white);
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
+}
+
+.btn-insta:hover {
+    background: linear-gradient(45deg, #e6683c 0%, #dc2743 25%, #cc2366 50%, #bc1888 75%, #8e1069 100%);
+    color: var(--color-white);
+}
+
 .btn-xl {
     font-size: 1.4rem;
     padding: 20px 40px;
