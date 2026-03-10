@@ -324,45 +324,51 @@ a {
     margin-bottom: 10px;
 }
 
-/* Before/After */
-.ba-grid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.ba-item {
-    flex: 1;
-    min-width: 140px;
-}
-
-.ba-image {
+/* Before/After (Swiper スライドショー) */
+.beforeAfterSwiper {
     width: 100%;
+    max-width: 600px; /* PCで見ても大きすぎないサイズに */
+    margin: 0 auto;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-float);
+    overflow: hidden;
+    background-color: var(--color-white);
+    padding-bottom: 40px; /* ページネーション（ドット）用の余白 */
+}
+
+.swiper-slide {
+    text-align: center;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.slide-image {
+    width: 100%;
+    height: auto;
     aspect-ratio: 4/3;
     object-fit: cover;
 }
 
-.ba-arrow {
-    font-size: 2rem;
+.slide-caption {
+    font-size: 1.2rem;
+    padding: 15px;
+    margin: 0;
+    width: 100%;
+}
+
+/* Swiperのボタン色を青に変更 */
+.swiper-button-next,
+.swiper-button-prev {
     color: var(--color-main);
+    transform: scale(0.6); /* 矢印を少し小さめに */
 }
 
-.ba-water {
-    text-align: center;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.ba-water p {
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.ba-water .ba-image {
-    aspect-ratio: 16/9;
+/* ページネーションの色を青に変更 */
+.swiper-pagination-bullet-active {
+    background-color: var(--color-main) !important;
 }
 
 /* 特徴セクション */

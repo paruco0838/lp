@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
         rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -53,16 +55,41 @@
 <!-- Before/After -->
 <section class="section before-after" id="before-after">
     <div class="container">
-        <h2 class="section-title">プロの徹底洗浄でこんなに変わる！</h2>
-        <div class="ba-grid">
-            <!-- サンプル画像プレースホルダー -->
-            <div class="ba-item">
-                <img src="IMG_7292.jpg" alt="Before: カビだらけの内部" class="ba-image">
+        <h2 class="section-title">エアコンの内部って実はこんなに汚れてるんです</h2>
+        
+        <!-- Swiper -->
+        <div class="swiper beforeAfterSwiper">
+            <div class="swiper-wrapper">
+                <!-- スライド1: 洗浄前の汚れ -->
+                <div class="swiper-slide">
+                    <img src="IMG_2330.PNG" alt="エアコン内部の汚れ" class="slide-image">
+                </div>
+                <!-- スライド2: ピカピカに洗浄後1 -->
+                <div class="swiper-slide">
+                    <img src="IMG_2332.PNG" alt="洗浄後の熱交換器" class="slide-image">
+                </div>
+                <!-- スライド3: 奥の汚れ -->
+                <div class="swiper-slide">
+                    <img src="IMG_2334.PNG" alt="送風ファンの汚れ" class="slide-image">
+                </div>
+                <!-- スライド4: ピカピカに洗浄後2 -->
+                <div class="swiper-slide">
+                    <img src="IMG_2335.PNG" alt="洗浄後の送風ファン" class="slide-image">
+                </div>
+                <!-- スライド5: 出てきた汚水 -->
+                <div class="swiper-slide">
+                    <img src="IMG_2166.jpg" alt="エアコンから出た真っ黒な汚水" class="slide-image">
+                </div>
+                <!-- スライド6: スタッフ作業風景 -->
+                <div class="swiper-slide">
+                    <img src="IMG_2333.PNG" alt="プロの洗浄作業風景" class="slide-image">
+                </div>
             </div>
-            <div class="ba-arrow">▶︎</div>
-            <div class="ba-item">
-                <img src="IMG_7297.jpg" alt="After: ピカピカの内部" class="ba-image">
-            </div>
+            <!-- ナビゲーションボタン（左右の矢印） -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <!-- ページネーション（下のドット） -->
+            <div class="swiper-pagination"></div>
         </div>
     </div>
 </section>
@@ -100,21 +127,11 @@
 <section class="section voices" id="voices">
     <div class="container">
         <h2 class="section-title">ご利用いただいたお客様の声</h2>
-        <div class="voice-card">
-            <div class="voice-header">
-                <span class="voice-user">20代 1歳児のママ</span>
-                <span class="voice-stars">★★★★★</span>
-            </div>
-            <h3 class="voice-title">「これなら安心できます！」</h3>
-            <p class="voice-text">子供の軽い咳が気になって頼みました。作業中に真っ黒な水が出てきてゾッとしましたが、これで心置きなくエアコンを使えます。</p>
+        <div class="voice-card image-voice">
+            <img src="IMG_2337.jpg" alt="お客様の声" style="width: 100%; height: auto; display: block; border-radius: 8px;">
         </div>
-        <div class="voice-card">
-            <div class="voice-header">
-                <span class="voice-user">30代 女性</span>
-                <span class="voice-stars">★★★★★</span>
-            </div>
-            <h3 class="voice-title">「清潔感のあるスタッフさんで安心」</h3>
-            <p class="voice-text">家に人が入るのが少し不安でしたが、作業に来てくれた方がとても清潔感があり、スリッパも持参してくれて丁寧な対応でした。</p>
+        <div class="voice-card image-voice">
+            <img src="IMG_2339.jpg" alt="お客様の声" style="width: 100%; height: auto; display: block; border-radius: 8px;">
         </div>
     </div>
 </section>
@@ -202,6 +219,35 @@
         </div>
     </div>
 </footer>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<!-- Swiperの初期化スクリプト -->
+<script>
+  const swiper = new Swiper('.beforeAfterSwiper', {
+    // オプション設定
+    loop: true, // 最後までいったら最初に戻る
+    speed: 600, // スライドのスピード
+    autoplay: {
+      delay: 3000, // 3秒ごとに自動スライド
+      disableOnInteraction: false, // 触っても自動再生を止めない
+    },
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true, // ドットを押して移動できる
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    // スマホ等で1枚を大きく表示
+    slidesPerView: 1, 
+    spaceBetween: 20,
+  });
+</script>
+
 </body>
 
 </html>
