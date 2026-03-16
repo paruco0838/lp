@@ -652,15 +652,15 @@ a {
     left: 0;
     right: 0;
     margin: 0 auto;
-    width: 90%;
-    max-width: 400px;
+    width: 85%;
+    max-width: 320px;
     background-color: var(--color-green);
     color: var(--color-white);
     text-align: center;
-    padding: 12px 10px;
+    padding: 8px 8px;
     z-index: 100;
     display: block;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     border-radius: var(--radius-round);
     border: 3px solid var(--color-white);
     animation: floating-bounce 2s infinite;
@@ -689,18 +689,18 @@ a {
 
 .cta-badge {
     display: table;
-    margin: 0 auto 5px;
+    margin: 0 auto 3px;
     background-color: var(--color-white);
     color: var(--color-green);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 900;
-    padding: 3px 12px;
+    padding: 2px 10px;
     border-radius: var(--radius-round);
 }
 
 .cta-text {
     display: inline-block;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 900;
     margin-right: 5px;
     vertical-align: middle;
@@ -708,7 +708,7 @@ a {
 
 .cta-sub {
     display: inline-block;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: bold;
     vertical-align: middle;
 }
