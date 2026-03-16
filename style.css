@@ -427,6 +427,14 @@ a {
     color: var(--color-main-dark);
 }
 
+.feature-img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+    margin-top: 20px;
+    display: block;
+}
+
 /* お客様の声 */
 .voice-card {
     background-color: var(--color-white);
