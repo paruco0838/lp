@@ -648,17 +648,34 @@ a {
 /* 追従CTA */
 .floating-cta {
     position: fixed;
-    bottom: 0px;
+    bottom: 20px;
     left: 0;
-    width: 100%;
+    right: 0;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 400px;
     background-color: var(--color-green);
     color: var(--color-white);
     text-align: center;
     padding: 12px 10px;
     z-index: 100;
-    display: flex;
-    justify-content: center;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    display: block;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-round);
+    border: 3px solid var(--color-white);
+    animation: floating-bounce 2s infinite;
+}
+
+@keyframes floating-bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-8px);
+    }
+    60% {
+        transform: translateY(-4px);
+    }
 }
 
 .floating-cta:hover {
@@ -667,33 +684,33 @@ a {
 }
 
 .cta-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
     width: 100%;
-    max-width: 500px;
 }
 
 .cta-badge {
+    display: table;
+    margin: 0 auto 5px;
     background-color: var(--color-white);
     color: var(--color-green);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 900;
-    padding: 2px 8px;
+    padding: 3px 12px;
     border-radius: var(--radius-round);
-    margin-right: 10px;
 }
 
 .cta-text {
-    font-size: 1.3rem;
+    display: inline-block;
+    font-size: 1.4rem;
     font-weight: 900;
-    margin-right: 10px;
+    margin-right: 5px;
+    vertical-align: middle;
 }
 
 .cta-sub {
-    font-size: 0.8rem;
+    display: inline-block;
+    font-size: 0.9rem;
     font-weight: bold;
+    vertical-align: middle;
 }
 
 /* コンテンツ下部に余白（追従CTAで隠れないように） */
@@ -729,10 +746,13 @@ body {
         bottom: 30px;
         left: auto;
         right: 30px;
+        margin: 0;
         width: auto;
         border-radius: var(--radius-round);
         padding: 15px 30px;
         box-shadow: var(--shadow-float);
+        border: none;
+        animation: none;
     }
 
     body {
