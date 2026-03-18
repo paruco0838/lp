@@ -152,17 +152,48 @@
 <section class="section pricing" id="pricing">
     <div class="container">
         <h2 class="section-title">料金プラン</h2>
-        <div class="price-card">
-            <h3>壁掛けエアコン（通常タイプ）</h3>
-            <p class="price-value">8,000<span class="price-unit">円〜(税込)</span></p>
-        </div>
-        <div class="price-card">
-            <h3>お掃除機能付きエアコン</h3>
-            <p class="price-value">15,000<span class="price-unit">円〜(税込)</span></p>
-        </div>
-        <p class="price-note text-right">※完全分解の場合、別途10,000円(税込)を頂戴しております</p>
+        <div class="plan-cards">
 
+            <!-- スタンダードプラン -->
+            <div class="plan-card">
+                <div class="plan-body">
+                    <h3 class="plan-name">スタンダードプラン</h3>
+                    <p class="plan-sub">業界一般的なクリーニングプランです</p>
+                    <div class="plan-prices">
+                        <p>ノーマルエアコン：<strong>8,000</strong>円</p>
+                        <p>お掃除機能付きエアコン：<strong>15,000</strong>円</p>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span>本体カバー脱着</span><span class="mark-circle">○</span></li>
+                        <li><span>お掃除機能脱着</span><span class="mark-circle">○</span></li>
+                        <li><span>ドレンパン脱着</span><span class="mark-cross">×</span></li>
+                        <li><span>送風ファン脱着</span><span class="mark-cross">×</span></li>
+                    </ul>
+                </div>
+                <div class="plan-badge plan-badge-standard">気軽に</div>
+            </div>
 
+            <!-- 完全分解クリーニング -->
+            <div class="plan-card plan-card-premium">
+                <div class="plan-body">
+                    <h3 class="plan-name">完全分解クリーニング</h3>
+                    <p class="plan-sub">業界でもまれな最高のクリーニングです</p>
+                    <div class="plan-prices">
+                        <p>ノーマルエアコン：<strong>18,000</strong>円</p>
+                        <p>お掃除機能付きエアコン：<strong>25,000</strong>円</p>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span>本体カバー脱着</span><span class="mark-circle">○</span></li>
+                        <li><span>お掃除機能脱着</span><span class="mark-circle">○</span></li>
+                        <li><span>ドレンパン脱着</span><span class="mark-circle">○</span></li>
+                        <li><span>送風ファン脱着</span><span class="mark-circle">○</span></li>
+                    </ul>
+                </div>
+                <div class="plan-badge plan-badge-premium">最高品質</div>
+            </div>
+
+        </div>
+        <p class="price-note" style="margin-top: 50px; text-align: center;">※価格はすべて税込です</p>
     </div>
 </section>
 
@@ -226,7 +257,6 @@
 </footer>
 
 <!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
 <!-- Swiperの初期化スクリプト -->
