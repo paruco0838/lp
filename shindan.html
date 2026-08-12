@@ -947,7 +947,7 @@
                 choices: [
                     { label: '変わらない', value: 'same', pts: 0 },
                     { label: '少し弱い気がする', value: 'slight', pts: 1 },
-                    { label: '明らかに悪い', value: 'bad', pts: 2 },
+                    { label: '明らかに悪い', value: 'bad', pts: 5 },
                 ],
             },
         };
@@ -996,8 +996,8 @@
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
         const ORDER = ['timing', 'lastType', 'years', 'frequency', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing5 + lastType1 + years5 + frequency5 + smell3 + dust3 + family2 + efficiency2）
-        const MAX_PTS = 26;
+        // 汚れ点数の最大値（timing5 + lastType1 + years5 + frequency5 + smell3 + dust3 + family2 + efficiency5）
+        const MAX_PTS = 29;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1274,7 +1274,7 @@
             const recommendFull = isLongNeglect() || (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 50 || (answers.lastType && answers.lastType.value !== 'full' && score >= 20);
             const recReasons = $('recReasons');
             if (recommendFull) {
-                $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>も<br>検討をおすすめします！';
+                $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>を<br>おすすめします！';
                 $('recLead').textContent = '通常のクリーニングでは落としきれない、奥の汚れやカビまでしっかり洗浄できます。';
                 if (reasons.length) {
                     recReasons.classList.remove('hidden');
