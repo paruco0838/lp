@@ -897,8 +897,8 @@
                 choices: [
                     { label: '1年未満', value: 'u1', pts: 0 },
                     { label: '1〜3年', value: 'y13', pts: 1 },
-                    { label: '4〜6年', value: 'y46', pts: 2 },
-                    { label: '7年以上', value: 'o7', pts: 3 },
+                    { label: '4〜6年', value: 'y46', pts: 3 },
+                    { label: '7年以上', value: 'o7', pts: 5 },
                 ],
             },
             frequency: {
@@ -908,7 +908,7 @@
                     { label: 'あまり使わない', value: 'rare', pts: 0 },
                     { label: '夏のみ・冬のみ使用する', value: 'season', pts: 1 },
                     { label: '夏と冬に使用する', value: 'both', pts: 2 },
-                    { label: '一年中使用する', value: 'all', pts: 3 },
+                    { label: '一年中使用する', value: 'all', pts: 5 },
                 ],
             },
             smell: {
@@ -925,10 +925,10 @@
                 title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
                 note: '',
                 choices: [
-                    { label: '見たことがない', value: 'never_checked', pts: 0 },
+                    { label: '見たことがない', value: 'never_checked', pts: 1 },
                     { label: '黒い点は見えない', value: 'none', pts: 0 },
                     { label: '黒い点が見える', value: 'spots', pts: 1 },
-                    { label: '黒いカスが出ることがある', value: 'debris', pts: 2 },
+                    { label: '黒いカスが出ることがある', value: 'debris', pts: 3 },
                 ],
             },
             family: {
@@ -937,7 +937,7 @@
                 choices: [
                     { label: '子供のみいる', value: 'child', pts: 0 },
                     { label: 'ペットのみ飼っている', value: 'pet', pts: 1 },
-                    { label: '両方いる', value: 'both', pts: 1 },
+                    { label: '両方いる', value: 'both', pts: 2 },
                     { label: 'どちらもいない', value: 'none', pts: 0 },
                 ],
             },
@@ -979,6 +979,7 @@
                 always: { title: 'ニオイが常に気になる', desc: '内部でカビが広がっている可能性が高い状態です。' },
             },
             dust: {
+                never_checked: { title: '内部の汚れを確認したことがない', desc: '見えない部分にホコリやカビがたまっている可能性があります。' },
                 spots: { title: '吹き出し口に黒い汚れが見える', desc: 'カビやホコリが内部にたまっているサインかもしれません。' },
                 debris: { title: '黒いカスが出ることがある', desc: '内部のカビ・汚れがはがれて出てきている状態です。' },
             },
@@ -995,8 +996,8 @@
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
         const ORDER = ['timing', 'lastType', 'years', 'frequency', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing5 + lastType1 + years3 + frequency3 + smell3 + dust2 + family1 + efficiency2）
-        const MAX_PTS = 20;
+        // 汚れ点数の最大値（timing5 + lastType1 + years5 + frequency5 + smell3 + dust3 + family2 + efficiency2）
+        const MAX_PTS = 26;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1104,7 +1105,11 @@
         // ===== 完全分解をおすすめする条件と理由 =====
         function fullReasons() {
             const reasons = [];
-            if (answers.dust && answers.dust.pts >= 1) reasons.push(answers.dust.value === 'debris' ? '黒いカスが出ることがある' : '黒い汚れがはっきり見える');
+            if (answers.dust) {
+                if (answers.dust.value === 'debris') reasons.push('黒いカスが出ることがある');
+                else if (answers.dust.value === 'spots') reasons.push('黒い汚れがはっきり見える');
+                else if (answers.dust.value === 'never_checked') reasons.push('内部の汚れを目視で確認できていない');
+            }
             if (answers.smell && answers.smell.pts >= 2) reasons.push('ニオイがかなり気になる');
             else if (answers.smell && answers.smell.pts === 1) reasons.push('つけ始めのニオイが気になる');
             if (answers.timing) {
