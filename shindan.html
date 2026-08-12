@@ -392,7 +392,7 @@
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部のキレイ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は全部で5問・約1分で完了</li>
+                <li>質問は最大7問・約1分で完了</li>
                 <li>キレイ度に合わせた状態の解説・アドバイス付き</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
@@ -420,6 +420,10 @@
             </div>
             <div class="result-text" id="resultText"></div>
             <div class="pet-box hidden" id="petBox"></div>
+            <div class="cta-area">
+                <a class="btn-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">📋 お見積もり希望の方はこちら</a>
+                <p class="cta-sub">LINEでエアコンの写真を送るだけ / 相談だけでもOK</p>
+            </div>
             <div style="text-align:center;">
                 <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
             </div>
@@ -467,14 +471,23 @@
                     { label: 'わからない', value: 'unknown' },
                 ],
             },
-            concern: {
-                title: 'エアコンに関して気になることはありますか？',
+            smell: {
+                title: 'エアコンのニオイやカビで気になることはありますか？',
                 note: '',
                 choices: [
-                    { label: '空気が臭う気がする', value: 'smell' },
-                    { label: '冷えが悪く感じる', value: 'cooling' },
-                    { label: '吹き出し口にカビが見える', value: 'mold' },
-                    { label: '特に気になることはない', value: 'none' },
+                    { label: 'カビ臭い・酸っぱいニオイがする', value: 'smell' },
+                    { label: '吹き出し口に黒い点（カビ）が見える', value: 'mold' },
+                    { label: 'ニオイもカビも気になる', value: 'both' },
+                    { label: '特に気にならない', value: 'none' },
+                ],
+            },
+            cooling: {
+                title: 'エアコンの効き（冷え・暖まり）はいかがですか？',
+                note: '',
+                choices: [
+                    { label: '以前より効きが悪くなった気がする', value: 'bad' },
+                    { label: '少し弱く感じることがある', value: 'slight' },
+                    { label: '問題なく効いている', value: 'ok' },
                 ],
             },
             pets: {
@@ -552,19 +565,16 @@
             if (!answers.years) return 'years';
             if (answers.timing === 'recent') {
                 if (!answers.lastType) return 'lastType';
-            } else {
-                // 購入2年未満は症状質問をスキップ（Miroの分岐どおり）
-                if (answers.years !== 'u2' && !answers.concern) return 'concern';
             }
+            if (!answers.smell) return 'smell';
+            if (!answers.cooling) return 'cooling';
             if (!answers.pets) return 'pets';
             return null; // 全問終了
         }
 
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
-            if (answers.timing === 'recent') return 5;
-            if (answers.timing && answers.years === 'u2') return 4;
-            return 5;
+            return answers.timing === 'recent' ? 7 : 6;
         }
 
         // ルート判定（Miroの分岐表を再現）
@@ -575,9 +585,41 @@
                 return a.years === 'u2' ? 'B' : 'C';
             }
             if (a.years === 'u2') return 'B';
-            if (a.concern === 'smell' || a.concern === 'mold') return 'D';
-            if (a.concern === 'cooling') return 'E';
+            if (a.smell !== 'none') return 'D';
+            if (a.cooling === 'bad') return 'E';
             return 'F';
+        }
+
+        // ニオイ・効きの回答によるキレイ度の減点（ルートで反映済みの分は除く）
+        function symptomModifier(route) {
+            const a = answers;
+            let mod = 0;
+            if (route !== 'D') {
+                if (a.smell === 'both') mod -= 15;
+                else if (a.smell === 'smell' || a.smell === 'mold') mod -= 10;
+            }
+            if (route !== 'E') {
+                if (a.cooling === 'bad') mod -= 10;
+                else if (a.cooling === 'slight') mod -= 5;
+            }
+            return mod;
+        }
+
+        // ニオイ・効きの追加コメント
+        function symptomTexts(route) {
+            const a = answers;
+            const texts = [];
+            if (route !== 'D' && a.smell !== 'none') {
+                texts.push('ニオイやカビが気になる場合、内部でカビが繁殖し始めている可能性があります。エアコンの風にカビの胞子が混じると、喘息やアレルギー等の健康被害につながることもあります。');
+            }
+            if (route !== 'E') {
+                if (a.cooling === 'bad') {
+                    texts.push('効きが悪い原因は、内部の汚れや室外機の汚れの可能性もあります。※室外機の清掃は電気代の削減にも繋がります。');
+                } else if (a.cooling === 'slight') {
+                    texts.push('効きが少し弱いと感じるときは、内部の汚れが影響し始めているサインかもしれません。');
+                }
+            }
+            return texts;
         }
 
         function showQuestion(key) {
@@ -630,7 +672,8 @@
 
         function showResult() {
             const route = decideRoute();
-            const score = SCORES[route][answers.pets];
+            // ベース点＋症状による減点（5%〜85%の範囲に収める）
+            const score = Math.max(5, Math.min(85, SCORES[route][answers.pets] + symptomModifier(route)));
             const emoji = score >= 75 ? '😍✨' : score >= 50 ? '🥺' : score >= 30 ? '😖' : '😱';
 
             $('questionCard').classList.add('hidden');
@@ -658,7 +701,8 @@
                 $('gaugeFill').style.width = `${score}%`;
             }, 100);
 
-            $('resultText').innerHTML = ROUTE_TEXT[route].map((t) => `<p>${t}</p>`).join('');
+            const texts = ROUTE_TEXT[route].concat(symptomTexts(route));
+            $('resultText').innerHTML = texts.map((t) => `<p>${t}</p>`).join('');
 
             const petText = PET_TEXT[answers.pets];
             const petBox = $('petBox');
@@ -676,7 +720,7 @@
             const lastKey = history.pop();
             if (lastKey === undefined) return;
             // 戻る質問以降の回答をすべて消す（分岐のズレを防ぐ）
-            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'concern', 'pets'];
+            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'smell', 'cooling', 'pets'];
             const idx = keysOrder.indexOf(lastKey);
             keysOrder.slice(idx).forEach((k) => delete answers[k]);
             showQuestion(lastKey);
