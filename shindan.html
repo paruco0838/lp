@@ -805,7 +805,7 @@
                         </div>
                     </div>
                     <div class="score-msg">
-                        <p class="msg-label" id="msgLabel">あなたのエアコンキレイ度</p>
+                        <p class="msg-label" id="msgLabel">あなたのエアコンは…</p>
                         <p class="msg-level" id="msgLevel"></p>
                         <div class="warn-box" id="warnBox">
                             <span class="warn-icon" id="warnIcon">⚠️</span>
@@ -1163,7 +1163,8 @@
         }
 
         function showResult() {
-            const score = calcRecScore();          // 汚れスコア（汚れているほど大きい％で表示）
+            const score = calcRecScore();          // 汚れスコア（内部判定用。高いほど汚れている）
+            const cleanScore = Math.max(5, Math.min(95, 100 - score)); // キレイ度（表示用。低いほど汚れている＝悪い）
             const level = levelOf(score);
             const color = colorOf(score);
             const concerns = buildConcerns();
@@ -1177,7 +1178,7 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ（汚れているほど数字が大きい。低い=青 → 緑・黄 → 高い=赤）
+            // リングゲージ（キレイ度を表示。数字が低いほど悪い＝赤、高いほど良い＝青）
             const ringFg = $('ringFg');
             const ringCenter = $('ringCenter');
             ringFg.className.baseVal = 'ring-fg';
@@ -1186,17 +1187,17 @@
             ringCenter.style.color = color;
             const CIRC = 364.4;
             setTimeout(() => {
-                ringFg.style.strokeDashoffset = CIRC * (1 - score / 100);
+                ringFg.style.strokeDashoffset = CIRC * (1 - cleanScore / 100);
             }, 100);
 
             // 数字カウントアップ
             const numEl = $('recNum');
             let cur = 0;
-            const step = Math.max(1, Math.round(score / 40));
+            const step = Math.max(1, Math.round(cleanScore / 40));
             const timer = setInterval(() => {
-                cur = Math.min(score, cur + step);
+                cur = Math.min(cleanScore, cur + step);
                 numEl.textContent = cur;
-                if (cur >= score) clearInterval(timer);
+                if (cur >= cleanScore) clearInterval(timer);
             }, 25);
 
             // 状態フレーズ（スコアと同じ色で表示）
