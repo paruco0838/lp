@@ -805,7 +805,7 @@
                         </div>
                     </div>
                     <div class="score-msg">
-                        <p class="msg-label" id="msgLabel">クリーニングおすすめ度</p>
+                        <p class="msg-label" id="msgLabel">あなたのエアコンキレイ度</p>
                         <p class="msg-level" id="msgLevel"></p>
                         <div class="warn-box" id="warnBox">
                             <span class="warn-icon" id="warnIcon">⚠️</span>
@@ -1046,12 +1046,18 @@
             return Math.max(5, Math.min(95, total));
         }
 
-        // おすすめ度のレベル
+        // 汚れスコアに応じた状態フレーズ
         function levelOf(score) {
-            if (score >= 75) return { text: '非常に高め', cls: '' };
-            if (score >= 50) return { text: '高め', cls: '' };
-            if (score >= 30) return { text: 'やや高め', cls: 'mid' };
-            return { text: '低め', cls: 'low' };
+            if (score >= 70) return 'かなり汚れているかも';
+            if (score >= 50) return '汚れがたまり始めています';
+            if (score >= 30) return 'おおむね良好な状態です';
+            return 'とてもキレイな状態です';
+        }
+
+        // 汚れスコアに応じた色（低い=青 → 緑 → 黄 → 高い=赤）
+        function colorOf(score) {
+            const hue = Math.round(210 - score * 2.1);
+            return `hsl(${hue}, 78%, 44%)`;
         }
 
         // ===== 気になったポイントの一覧を作る（減点が大きい順） =====
@@ -1157,9 +1163,9 @@
         }
 
         function showResult() {
-            const score = calcRecScore();          // お掃除おすすめ度（コメント・レベル判定用）
-            const cleanScore = 100 - score;        // キレイ度（グラフ表示用）
+            const score = calcRecScore();          // 汚れスコア（汚れているほど大きい％で表示）
             const level = levelOf(score);
+            const color = colorOf(score);
             const concerns = buildConcerns();
             const sympN = symptomCount();
 
@@ -1171,29 +1177,30 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ（キレイ度を表示。高いほど青、低いほど赤）
-            const ringCls = cleanScore >= 70 ? 'good' : cleanScore >= 40 ? 'mid' : '';
+            // リングゲージ（汚れているほど数字が大きい。低い=青 → 緑・黄 → 高い=赤）
             const ringFg = $('ringFg');
             const ringCenter = $('ringCenter');
-            ringFg.className.baseVal = 'ring-fg ' + ringCls;
-            ringCenter.className = 'ring-center ' + ringCls;
+            ringFg.className.baseVal = 'ring-fg';
+            ringCenter.className = 'ring-center';
+            ringFg.style.stroke = color;
+            ringCenter.style.color = color;
             const CIRC = 364.4;
             setTimeout(() => {
-                ringFg.style.strokeDashoffset = CIRC * (1 - cleanScore / 100);
+                ringFg.style.strokeDashoffset = CIRC * (1 - score / 100);
             }, 100);
 
             // 数字カウントアップ
             const numEl = $('recNum');
             let cur = 0;
-            const step = Math.max(1, Math.round(cleanScore / 40));
+            const step = Math.max(1, Math.round(score / 40));
             const timer = setInterval(() => {
-                cur = Math.min(cleanScore, cur + step);
+                cur = Math.min(score, cur + step);
                 numEl.textContent = cur;
-                if (cur >= cleanScore) clearInterval(timer);
+                if (cur >= score) clearInterval(timer);
             }, 25);
 
-            // レベル表示（クリーニングおすすめ度）
-            $('msgLevel').innerHTML = `<span class="lv ${level.cls}">${level.text}</span>です！`;
+            // 状態フレーズ（スコアと同じ色で表示）
+            $('msgLevel').innerHTML = `<span class="lv" style="color:${color}">${level}</span>！`;
 
             // 状況メッセージ
             const warnBox = $('warnBox');
