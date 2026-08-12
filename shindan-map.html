@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エアコンキレイ度診断 質問マップ</title>
+    <style>
+        :root {
+            --navy: #102840;
+            --navy-2: #173b5d;
+            --blue: #2d8fd5;
+            --sky: #eaf6ff;
+            --mint: #e8f8f0;
+            --line: #06c755;
+            --line-dark: #049640;
+            --orange: #f28b25;
+            --red: #d9493f;
+            --ink: #1e2933;
+            --muted: #607080;
+            --border: #dce5ec;
+            --bg: #f6fbff;
+            --white: #ffffff;
+            --shadow: 0 8px 24px rgba(16, 40, 64, 0.10);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, "system-ui", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            padding: 24px 16px 64px;
+        }
+
+        .wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* ヘッダー */
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        header p {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* 章見出し */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--navy);
+            margin: 36px 0 16px;
+        }
+
+        .section-title .no {
+            background: var(--navy);
+            color: #fff;
+            font-size: 13px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* スタート／ゴールのノード */
+        .node-cap {
+            background: var(--navy);
+            color: #fff;
+            font-weight: 900;
+            font-size: 15px;
+            text-align: center;
+            border-radius: 999px;
+            padding: 10px 24px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .node-cap.goal {
+            background: var(--blue);
+        }
+
+        /* 縦のつなぎ線 */
+        .connector {
+            width: 3px;
+            height: 22px;
+            background: var(--border);
+            margin: 0 auto;
+        }
+
+        .connector.short {
+            height: 14px;
+        }
+
+        /* 質問カード */
+        .q-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 16px 18px;
+        }
+
+        .q-card.conditional {
+            border-color: var(--blue);
+            border-style: dashed;
+            background: #fbfdff;
+        }
+
+        .q-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .q-no {
+            background: var(--navy);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 900;
+            padding: 3px 12px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        .q-card.conditional .q-no {
+            background: var(--blue);
+        }
+
+        .q-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        .q-cond {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--blue);
+            background: var(--sky);
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        /* 選択肢 */
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .choice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 6px 6px 14px;
+            font-size: 13.5px;
+            font-weight: 700;
+            background: var(--white);
+        }
+
+        .pts {
+            font-size: 11.5px;
+            font-weight: 900;
+            border-radius: 999px;
+            padding: 2px 9px;
+            white-space: nowrap;
+        }
+
+        .pts.p0 {
+            background: var(--mint);
+            color: var(--line-dark);
+        }
+
+        .pts.p1 {
+            background: #fff8e5;
+            color: #b8860b;
+        }
+
+        .pts.p2 {
+            background: #fff1e3;
+            color: var(--orange);
+        }
+
+        .pts.p3 {
+            background: #fdecea;
+            color: var(--red);
+        }
+
+        /* 分岐ブロック */
+        .branch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        @media (max-width: 620px) {
+            .branch {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .branch-arm {
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .branch-arm.yes {
+            background: var(--sky);
+            border: 2px solid var(--blue);
+            color: var(--navy-2);
+        }
+
+        .branch-arm.no {
+            background: #f4f7fa;
+            border: 2px solid var(--border);
+            color: var(--muted);
+        }
+
+        .branch-arm .arm-label {
+            font-size: 11.5px;
+            font-weight: 900;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .branch-arm.yes .arm-label {
+            color: var(--blue);
+        }
+
+        /* 点数の説明 */
+        .info-card {
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 18px 20px;
+        }
+
+        .formula {
+            background: var(--navy);
+            color: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 15px;
+            margin: 14px 0;
+        }
+
+        .formula .small {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            opacity: .8;
+            margin-top: 6px;
+        }
+
+        .note {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 10px;
+        }
+
+        /* 結果の段階 */
+        .levels {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 620px) {
+            .levels {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .level {
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .level .lv-range {
+            font-size: 11.5px;
+            font-weight: 700;
+            opacity: .9;
+        }
+
+        .level .lv-name {
+            font-size: 13.5px;
+            font-weight: 900;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* 結果分岐 */
+        .result-branch {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .rb {
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            background: var(--white);
+        }
+
+        .rb.primary {
+            border-color: var(--blue);
+            background: #f5faff;
+        }
+
+        .rb-cond {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--blue);
+            margin-bottom: 4px;
+        }
+
+        .rb .rb-cond.gray {
+            color: var(--muted);
+        }
+
+        .rb-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        .rb-desc {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <h1>エアコンキレイ度診断 質問マップ</h1>
+            <p>質問・選択肢・分岐・点数の全体像</p>
+            <div class="legend">
+                <span><b class="pts p0">0点</b> 汚れなし</span>
+                <span><b class="pts p1">1点</b> 少し汚れ</span>
+                <span><b class="pts p2">2点</b> 汚れあり</span>
+                <span><b class="pts p3">3点</b> 汚れ大</span>
+            </div>
+        </header>
+
+        <!-- ===== 質問の流れ ===== -->
+        <div class="section-title"><span class="no">1</span>質問の流れ</div>
+
+        <div class="node-cap">診断スタート</div>
+        <div class="connector"></div>
+
+        <!-- Q1 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 1</span>
+                <span class="q-title">前回エアコンクリーニングをしたのはいつ頃ですか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">1年以内 <b class="pts p0">0点</b></span>
+                <span class="choice">2年以内 <b class="pts p1">1点</b></span>
+                <span class="choice">3年以上前 <b class="pts p2">2点</b></span>
+                <span class="choice">したことがない・覚えていない <b class="pts p3">3点</b></span>
+            </div>
+        </div>
+
+        <div class="connector short"></div>
+
+        <!-- 分岐 -->
+        <div class="branch">
+            <div class="branch-arm yes">
+                <span class="arm-label">「1年以内」「2年以内」を選んだ人だけ</span>
+                ↓ 質問2（洗浄タイプ）へ進む<br>
+                → 全 7問
+            </div>
+            <div class="branch-arm no">
+                <span class="arm-label">「3年以上前」「したことがない」を選んだ人</span>
+                ↓ 質問2をスキップして質問3へ<br>
+                → 全 6問
+            </div>
+        </div>
+
+        <div class="connector short"></div>
+
+        <!-- Q2 条件付き -->
+        <div class="q-card conditional">
+            <div class="q-head">
+                <span class="q-no">質問 2</span>
+                <span class="q-title">前回のクリーニングは、通常分解・完全分解のどちらでしたか？</span>
+            </div>
+            <span class="q-cond">⚠️ クリーニング経験がある人だけに表示（唯一の分岐）</span>
+            <div class="choices">
+                <span class="choice">完全分解 <b class="pts p0">0点</b></span>
+                <span class="choice">通常分解 <b class="pts p1">1点</b></span>
+                <span class="choice">わからない <b class="pts p1">1点</b></span>
+            </div>
+        </div>
+
+        <div class="connector"></div>
+
+        <!-- Q3 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 3</span>
+                <span class="q-title">エアコンの使用年数はどれくらいですか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">1年未満 <b class="pts p0">0点</b></span>
+                <span class="choice">1〜3年 <b class="pts p1">1点</b></span>
+                <span class="choice">4〜7年 <b class="pts p2">2点</b></span>
+                <span class="choice">8年以上 <b class="pts p3">3点</b></span>
+            </div>
+        </div>
+
+        <div class="connector"></div>
+
+        <!-- Q4 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 4</span>
+                <span class="q-title">エアコンをつけたときのニオイはいかがですか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">気にならない <b class="pts p0">0点</b></span>
+                <span class="choice">しばらくすると気になる <b class="pts p1">1点</b></span>
+                <span class="choice">すぐ臭う <b class="pts p2">2点</b></span>
+                <span class="choice">常に臭う <b class="pts p3">3点</b></span>
+            </div>
+        </div>
+
+        <div class="connector"></div>
+
+        <!-- Q5 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 5</span>
+                <span class="q-title">吹き出し口や送風の汚れ・黒いカスは気になりますか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">見たことがない <b class="pts p0">0点</b></span>
+                <span class="choice">黒い点は見えない <b class="pts p0">0点</b></span>
+                <span class="choice">黒い点が見える <b class="pts p1">1点</b></span>
+                <span class="choice">黒いカスが出ることがある <b class="pts p2">2点</b></span>
+            </div>
+        </div>
+
+        <div class="connector"></div>
+
+        <!-- Q6 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 6</span>
+                <span class="q-title">ご家庭に小さなお子様やペットはいらっしゃいますか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">子供のみいる <b class="pts p0">0点</b></span>
+                <span class="choice">ペットのみ飼っている <b class="pts p1">1点</b></span>
+                <span class="choice">両方いる <b class="pts p1">1点</b></span>
+                <span class="choice">どちらもいない <b class="pts p0">0点</b></span>
+            </div>
+            <p class="note">※お子様の有無は点数に影響しません（エアコンの汚れとは無関係のため）。結果ページのアドバイス文にだけ使われます。</p>
+        </div>
+
+        <div class="connector"></div>
+
+        <!-- Q7 -->
+        <div class="q-card">
+            <div class="q-head">
+                <span class="q-no">質問 7</span>
+                <span class="q-title">エアコンの効き方や電気代について、変化はありますか？</span>
+            </div>
+            <div class="choices">
+                <span class="choice">変わらない <b class="pts p0">0点</b></span>
+                <span class="choice">少し弱い気がする <b class="pts p1">1点</b></span>
+                <span class="choice">明らかに悪い <b class="pts p2">2点</b></span>
+            </div>
+        </div>
+
+        <div class="connector"></div>
+        <div class="node-cap goal">診断結果へ</div>
+
+        <!-- ===== 点数の計算 ===== -->
+        <div class="section-title"><span class="no">2</span>点数の計算</div>
+
+        <div class="info-card">
+            <div class="formula">
+                キレイ度 ＝ 100% − （選んだ点数の合計 ÷ 15点 × 100）
+                <span class="small">結果は 5%〜95% の範囲で表示されます</span>
+            </div>
+            <p class="note">
+                満点15点の内訳：前回のクリーニング（最大3点）＋洗浄タイプ（最大1点）＋使用年数（最大3点）＋ニオイ（最大3点）＋黒いカス（最大2点）＋お子様/ペット（最大1点）＋効き（最大2点）
+            </p>
+            <p class="note">
+                例：3年以上前(2点) ＋ 4〜7年(2点) ＋ しばらくすると気になる(1点) ＋ 黒い点が見える(1点) ＋ どちらもいない(0点) ＋ 少し弱い(1点) ＝ 7点 → <b>キレイ度 53%</b>
+            </p>
+        </div>
+
+        <!-- ===== 結果の見せ方 ===== -->
+        <div class="section-title"><span class="no">3</span>結果の見せ方（4段階）</div>
+
+        <div class="info-card">
+            <p class="note" style="margin-top:0;">リングの色と状態フレーズは、汚れ具合に応じて4段階で変わります。</p>
+            <div class="levels">
+                <div class="level" style="background:hsl(200,78%,44%)">
+                    <div class="lv-range">キレイ度 70%以上</div>
+                    <div class="lv-name">とてもキレイな<br>状態です</div>
+                </div>
+                <div class="level" style="background:hsl(110,78%,40%)">
+                    <div class="lv-range">キレイ度 50〜69%</div>
+                    <div class="lv-name">おおむね良好な<br>状態です</div>
+                </div>
+                <div class="level" style="background:hsl(40,80%,45%)">
+                    <div class="lv-range">キレイ度 30〜49%</div>
+                    <div class="lv-name">汚れがたまり<br>始めています</div>
+                </div>
+                <div class="level" style="background:hsl(5,78%,46%)">
+                    <div class="lv-range">キレイ度 30%未満</div>
+                    <div class="lv-name">かなり汚れて<br>いるかも</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== おすすめの分岐 ===== -->
+        <div class="section-title"><span class="no">4</span>「あなたの場合」の提案分岐</div>
+
+        <div class="result-branch">
+            <div class="rb primary">
+                <p class="rb-cond">▼ 次のどれかに当てはまる場合</p>
+                <p class="rb-title">完全分解クリーニングも検討をおすすめします！</p>
+                <p class="rb-desc">
+                    ・黒い点／黒いカスが見える　・ニオイがすぐ臭う以上<br>
+                    ・汚れの合計が高い　・前回が通常分解でそこそこ汚れている<br>
+                    → 当てはまった項目が「おすすめの理由」として自動でリスト表示されます。
+                </p>
+            </div>
+            <div class="rb">
+                <p class="rb-cond gray">▼ 上に当てはまらず、そこそこ汚れている場合</p>
+                <p class="rb-title">そろそろクリーニングの検討がおすすめです</p>
+                <p class="rb-desc">スタンダード洗浄からでも十分効果が見込めることを案内します。</p>
+            </div>
+            <div class="rb">
+                <p class="rb-cond gray">▼ 汚れがほとんどない場合</p>
+                <p class="rb-title">今すぐのクリーニングは必須ではなさそうです</p>
+                <p class="rb-desc">2年に1度を目安にした定期的な分解洗浄をおすすめします。</p>
+            </div>
+        </div>
+
+        <div class="section-title"><span class="no">5</span>結果ページに出るその他の要素</div>
+        <div class="info-card">
+            <p class="note" style="margin-top:0;">
+                <b>特に気になったポイント</b>：点数が付いた回答を、影響が大きい順に理由つきで一覧表示<br>
+                <b>お子様・ペットのアドバイス</b>：質問6の回答に応じて4パターンの声かけを出し分け<br>
+                <b>通常 vs 完全分解の比較</b>／<b>カジラクの安心3項目</b>／<b>お見積もりボタン</b>：全員に共通で表示
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
