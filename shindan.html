@@ -1045,15 +1045,15 @@
             }
             let score = Math.max(5, Math.min(95, total));
             // 4年以上お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
-            if (isLongNeglect()) score = Math.max(score, 55);
+            if (isLongNeglect()) score = Math.max(score, 45);
             return score;
         }
 
-        // 汚れスコアに応じた状態フレーズ
+        // 汚れスコアに応じた状態フレーズ（キレイ度80%以上を「とてもキレイ」の基準とし、各段階を10%ずつ引き上げ）
         function levelOf(score) {
-            if (score >= 70) return 'かなり汚れているかも';
-            if (score >= 50) return '汚れがたまり始めています';
-            if (score >= 30) return 'おおむね良好な状態です';
+            if (score >= 60) return 'かなり汚れているかも';
+            if (score >= 40) return '汚れがたまり始めています';
+            if (score >= 20) return 'おおむね良好な状態です';
             return 'とてもキレイな状態です';
         }
 
@@ -1228,7 +1228,7 @@
                 warnText = 'ニオイや汚れのサインが複数見られました。エアコン内部に汚れがたまっている可能性が高そうです。';
             } else if (sympN === 1) {
                 warnText = '汚れのサインが見られました。内部に汚れがたまり始めているかもしれません。';
-            } else if (score >= 50) {
+            } else if (score >= 40) {
                 warnText = '目立った症状はまだ出ていませんが、期間的に内部へ汚れがたまっている可能性があります。';
             } else {
                 warnText = '大きな汚れのサインは見つかりませんでした。良い状態をキープできています✨';
@@ -1258,7 +1258,7 @@
 
             // あなたの場合（おすすめ）
             const reasons = fullReasons();
-            const recommendFull = isLongNeglect() || (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 60 || (answers.lastType && answers.lastType.value !== 'full' && score >= 30);
+            const recommendFull = isLongNeglect() || (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 50 || (answers.lastType && answers.lastType.value !== 'full' && score >= 20);
             const recReasons = $('recReasons');
             if (recommendFull) {
                 $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>も<br>検討をおすすめします！';
@@ -1269,7 +1269,7 @@
                 } else {
                     recReasons.classList.add('hidden');
                 }
-            } else if (score >= 30) {
+            } else if (score >= 20) {
                 $('recTitle').innerHTML = 'そろそろ<span class="accent">クリーニング</span>の<br>検討がおすすめです';
                 $('recLead').textContent = '大きな症状が出る前のクリーニングが、費用も時間も一番おトクです。まずはスタンダード洗浄からでも十分効果が見込めます。';
                 recReasons.classList.add('hidden');
