@@ -212,6 +212,14 @@
             transform: scale(.98);
         }
 
+        .choice-sub {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
         .back-link {
             display: inline-block;
             margin-top: 16px;
@@ -936,7 +944,7 @@
                 title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
                 note: '',
                 choices: [
-                    { label: '見たことがない', value: 'none', pts: 0 },
+                    { label: '見たことがない', sub: '黒い点は見えない', value: 'none', pts: 0 },
                     { label: '黒い点が見える', value: 'spots', pts: 1 },
                     { label: '黒いカスが出ることがある', value: 'debris', pts: 2 },
                 ],
@@ -1136,7 +1144,11 @@
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'choice-btn';
-                btn.textContent = c.label;
+                if (c.sub) {
+                    btn.innerHTML = `${c.label}<span class="choice-sub">${c.sub}</span>`;
+                } else {
+                    btn.textContent = c.label;
+                }
                 btn.addEventListener('click', () => {
                     answers[key] = { value: c.value, pts: c.pts, label: c.label };
                     history.push(key);
