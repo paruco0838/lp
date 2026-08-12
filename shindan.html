@@ -1050,23 +1050,30 @@
             return score;
         }
 
+        // 4段階の状態フレーズと色（結果の見せ方の一覧表と同じ色に固定。連続計算式だと基準値を調整するたびに色がズレるため）
+        const LEVELS = [
+            { min: 60, text: 'かなり汚れているかも', hue: 5 },
+            { min: 40, text: '汚れがたまり始めています', hue: 40 },
+            { min: 20, text: 'おおむね良好な状態です', hue: 110 },
+            { min: 0, text: 'とてもキレイな状態です', hue: 200 },
+        ];
+
+        function levelInfo(score) {
+            return LEVELS.find((lv) => score >= lv.min) || LEVELS[LEVELS.length - 1];
+        }
+
         // 汚れスコアに応じた状態フレーズ（キレイ度80%以上を「とてもキレイ」の基準とし、各段階を10%ずつ引き上げ）
         function levelOf(score) {
-            if (score >= 60) return 'かなり汚れているかも';
-            if (score >= 40) return '汚れがたまり始めています';
-            if (score >= 20) return 'おおむね良好な状態です';
-            return 'とてもキレイな状態です';
+            return levelInfo(score).text;
         }
 
-        // 汚れスコアに応じた色（低い=青 → 緑 → 黄 → 高い=赤）
+        // 汚れスコアに応じた色（段階ごとに固定：かなり汚れている=赤／汚れ始め=橙／おおむね良好=緑／とてもキレイ=青）
         function colorOf(score) {
-            const hue = Math.round(210 - score * 2.1);
-            return `hsl(${hue}, 78%, 44%)`;
+            return `hsl(${levelInfo(score).hue}, 78%, 44%)`;
         }
 
-        // キレイ度に応じたリングのグラデーション（低い=赤、高いほど青に近づく単色。同じ色相内で濃淡をつけた光沢表現）
-        function buildRingGradient(cleanScore) {
-            const hue = Math.round(cleanScore * 2.1);
+        // キレイ度に応じたリングのグラデーション（段階の色を基準に、同じ色相内で濃淡をつけた光沢表現）
+        function buildRingGradient(cleanScore, hue) {
             const mid = (cleanScore / 2).toFixed(1);
             const end = cleanScore.toFixed(1);
             const stops = [
@@ -1201,10 +1208,11 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ（キレイ度をグラデーションで表示。低い=赤 → 高いほど青に近づく）
+            // リングゲージ（4段階のラベルと同じ色に固定。低い=赤 → 高いほど青に近づく）
             const ringFill = $('ringFill');
             const ringCenter = $('ringCenter');
             ringCenter.style.color = color;
+            const hue = levelInfo(score).hue;
 
             // 数字カウントアップ＋リングのグラデーションを同時に伸ばす
             const numEl = $('recNum');
@@ -1213,7 +1221,7 @@
             const timer = setInterval(() => {
                 cur = Math.min(cleanScore, cur + step);
                 numEl.textContent = cur;
-                ringFill.style.background = buildRingGradient(cur);
+                ringFill.style.background = buildRingGradient(cur, hue);
                 if (cur >= cleanScore) clearInterval(timer);
             }, 25);
 
@@ -1311,7 +1319,7 @@
             history = [];
             $('resultArea').classList.add('hidden');
             $('progressArea').style.display = 'none';
-            $('ringFill').style.background = buildRingGradient(0);
+            $('ringFill').style.background = buildRingGradient(0, 200);
             $('recNum').textContent = '0';
             $('startCard').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
