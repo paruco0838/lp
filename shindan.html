@@ -282,7 +282,7 @@
             right: 10px;
             bottom: 10px;
             border-radius: 50%;
-            background: conic-gradient(from -90deg, var(--border) 0%, var(--border) 100%);
+            background: conic-gradient(from 0deg, var(--border) 0%, var(--border) 100%);
             transition: background .2s linear;
         }
 
@@ -1051,7 +1051,7 @@
             }
             stops.push(`var(--border) ${cleanScore.toFixed(1)}%`);
             stops.push(`var(--border) 100%`);
-            return `conic-gradient(from -90deg, ${stops.join(', ')})`;
+            return `conic-gradient(from 0deg, ${stops.join(', ')})`;
         }
 
         // ===== 気になったポイントの一覧を作る（減点が大きい順） =====
