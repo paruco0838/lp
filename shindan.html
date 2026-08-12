@@ -310,6 +310,9 @@
             padding: 16px 12px;
             box-shadow: 0 6px 16px rgba(6, 199, 85, .35);
             transition: background .15s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .btn-line:hover {
@@ -392,7 +395,7 @@
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部のキレイ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は最大7問・約1分で完了</li>
+                <li>質問は最大8問・約1分で完了</li>
                 <li>キレイ度に合わせた状態の解説・アドバイス付き</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
@@ -433,124 +436,155 @@
     </div>
 
     <script>
-        // ===== 質問の定義 =====
+        // ===== 質問の定義（各選択肢に汚れ点数 pts を持つ加点方式） =====
         const QUESTIONS = {
             timing: {
-                title: '最後にエアコンクリーニングを頼んだのはいつですか？',
+                title: '前回エアコンクリーニングをしたのはいつ頃ですか？',
                 note: '※プロ業者によるクリーニングのみ。セルフクリーニングは除きます',
                 choices: [
-                    { label: '最近頼んだ（1〜2年未満）', value: 'recent' },
-                    { label: '2年以上前', value: 'old' },
-                    { label: '頼んだことはない', value: 'never' },
-                ],
-            },
-            freq: {
-                title: 'エアコンを使用する頻度はどれくらいですか？',
-                note: '',
-                choices: [
-                    { label: '一年中使用する', value: 'all' },
-                    { label: '夏のみ使用する', value: 'summer' },
-                    { label: '夏と冬に使用する', value: 'both' },
-                ],
-            },
-            years: {
-                title: 'エアコン購入後の利用年数はどれくらいですか？',
-                note: '',
-                choices: [
-                    { label: '2年未満', value: 'u2' },
-                    { label: '2〜4年', value: 'y24' },
-                    { label: '4年以上', value: 'o4' },
+                    { label: '1年以内', value: 'y1', pts: 0 },
+                    { label: '2年以内', value: 'y2', pts: 1 },
+                    { label: '3年以上前', value: 'y3', pts: 2 },
+                    { label: 'したことがない・覚えていない', value: 'never', pts: 3 },
                 ],
             },
             lastType: {
                 title: '前回のクリーニングは、通常分解・完全分解のどちらでしたか？',
                 note: '※ほとんどの方が通常分解の洗浄です。完全分解はごく少数の方が選んでいます',
                 choices: [
-                    { label: '通常分解', value: 'normal' },
-                    { label: '完全分解', value: 'full' },
-                    { label: 'わからない', value: 'unknown' },
+                    { label: '完全分解', value: 'full', pts: 0 },
+                    { label: '通常分解', value: 'normal', pts: 1 },
+                    { label: 'わからない', value: 'unknown', pts: 1 },
+                ],
+            },
+            years: {
+                title: 'エアコンの使用年数はどれくらいですか？',
+                note: '',
+                choices: [
+                    { label: '1年未満', value: 'u1', pts: 0 },
+                    { label: '1〜3年', value: 'y13', pts: 1 },
+                    { label: '4〜7年', value: 'y47', pts: 2 },
+                    { label: '8年以上', value: 'o8', pts: 3 },
                 ],
             },
             smell: {
-                title: 'エアコンのニオイやカビで気になることはありますか？',
+                title: 'エアコンをつけたときのニオイはいかがですか？',
                 note: '',
                 choices: [
-                    { label: 'カビ臭い・酸っぱいニオイがする', value: 'smell' },
-                    { label: '吹き出し口に黒い点（カビ）が見える', value: 'mold' },
-                    { label: 'ニオイもカビも気になる', value: 'both' },
-                    { label: '特に気にならない', value: 'none' },
+                    { label: '気にならない', value: 'none', pts: 0 },
+                    { label: 'しばらくすると気になる', value: 'later', pts: 1 },
+                    { label: 'すぐ臭う', value: 'soon', pts: 2 },
+                    { label: '常に臭う', value: 'always', pts: 3 },
                 ],
             },
-            cooling: {
-                title: 'エアコンの効き（冷え・暖まり）はいかがですか？',
+            dust: {
+                title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
                 note: '',
                 choices: [
-                    { label: '以前より効きが悪くなった気がする', value: 'bad' },
-                    { label: '少し弱く感じることがある', value: 'slight' },
-                    { label: '問題なく効いている', value: 'ok' },
+                    { label: '見えない', value: 'none', pts: 0 },
+                    { label: '黒い点が見える', value: 'spots', pts: 1 },
+                    { label: '黒いカスが出ることがある', value: 'debris', pts: 2 },
+                    { label: '頻繁に降ってくる', value: 'often', pts: 3 },
                 ],
             },
-            pets: {
-                title: '最後に、ご自宅にペットやお子様はいらっしゃいますか？',
+            child: {
+                title: 'ご家庭に小さなお子様はいらっしゃいますか？',
                 note: '',
                 choices: [
-                    { label: 'ペットのみ飼っている', value: 'pet' },
-                    { label: '子供のみいる', value: 'child' },
-                    { label: '両方いる', value: 'both' },
-                    { label: 'ペットも子供もいない', value: 'none' },
+                    { label: 'いない', value: 'no', pts: 0 },
+                    { label: 'いる', value: 'yes', pts: 0 },
+                ],
+            },
+            pet: {
+                title: 'ペットは飼われていますか？',
+                note: '',
+                choices: [
+                    { label: '飼っていない', value: 'no', pts: 0 },
+                    { label: '飼っている', value: 'yes', pts: 1 },
+                ],
+            },
+            efficiency: {
+                title: 'エアコンの効き方や電気代について、変化はありますか？',
+                note: '',
+                choices: [
+                    { label: '変わらない', value: 'same', pts: 0 },
+                    { label: '少し弱い気がする', value: 'slight', pts: 1 },
+                    { label: '明らかに悪い', value: 'bad', pts: 2 },
                 ],
             },
         };
 
-        // ===== キレイ度スコア表（Miroの分岐を再現） =====
-        const SCORES = {
-            A: { pet: 75, child: 80, both: 75, none: 85 },   // 完全分解でクリーニング済み
-            B: { pet: 50, child: 60, both: 50, none: 60 },   // クリーニング済み・2年経過目安
-            C: { pet: 40, child: 45, both: 35, none: 50 },   // 通常分解＋年数経過
-            D: { pet: 10, child: 10, both: 10, none: 20 },   // 臭い・カビが気になる
-            E: { pet: 10, child: 10, both: 20, none: 30 },   // 冷えが悪い
-            F: { pet: 30, child: 30, both: 30, none: 30 },   // 長期間未クリーニング（自覚症状なし）
-        };
+        // 質問を出す順番（lastTypeはクリーニング経験者のみ）
+        const ORDER = ['timing', 'lastType', 'years', 'smell', 'dust', 'child', 'pet', 'efficiency'];
 
-        // ===== ルート別の診断コメント =====
-        const ROUTE_TEXT = {
-            A: [
-                '定期的なお掃除が行われているため、現状維持をオススメします。次の定期クリーニングまで問題はなさそうです。',
-                'ただ、前回のクリーニングから2年ほど経っている場合は、そろそろエアコンクリーニングを検討した方が良いかもしれません。',
-                '綺麗にこだわりたい方は2年に1度、少なくとも3年に1度の分解洗浄をオススメします。',
-            ],
-            B: [
-                '前回のクリーニング（またはご購入）から2年ほど経っていたら、そろそろクリーニングの時期かもしれません。',
-                'エアコンが汚れていると、エアコンから出る風にカビの胞子が混じるようになり、喘息やアレルギー等の健康被害を起こしやすくなります。',
-            ],
-            C: [
-                '通常分解でのクリーニングの場合、奥やドレンパン部分に洗い残しが生じてしまいます。',
-                'そのため、クリーニングをしても臭いが取りきれないことがあり、取りきれなかったカビが次第に繁殖することがあります。',
-                '送風ファン・ドレンパンまで外して洗う「完全分解クリーニング」をオススメします。',
-            ],
-            D: [
-                '汚れと機能低下の兆しが見られます。早いタイミングでのプロによるクリーニングをオススメします。',
-                'エアコンが汚れていると、エアコンから出る風にカビの胞子が混じるようになり、喘息やアレルギー等の健康被害を起こしやすくなります。',
-                'カビ臭さや黒い汚れが気になる場合は、奥まで徹底洗浄できる「完全分解クリーニング」がオススメです。',
-            ],
-            E: [
-                '長期間のメンテナンス不足により、エアコンはかなり汚れているかもしれません。',
-                'また、冷えが悪い原因は室外機の汚れの可能性もあるため、早めのプロによるクリーニングをオススメします。',
-                '※室外機の清掃は電気代の削減にも繋がります。',
-            ],
-            F: [
-                '長期間のメンテナンス不足により、エアコンはかなり汚れているかもしれません。',
-                'エアコンが汚れていると、喘息やアレルギー等の健康被害を起こしやすくなります。ご自身やご家族の身体のために、定期的なクリーニングをオススメします。',
-            ],
-        };
+        // 汚れ点数の最大値（timing3 + lastType1 + years3 + smell3 + dust3 + child0 + pet1 + efficiency2）
+        const MAX_PTS = 16;
 
-        // ===== ペット・お子様の追加コメント =====
-        const PET_TEXT = {
-            pet: '🐾 ペットを飼っているとエアコンが汚れやすく、ペットは長時間エアコンの空気を吸い続けるため、健康を損なうことが多いです。ペットとご自身の身体のために、定期的なクリーニングをおすすめします。',
-            child: '🧒 お子様は免疫力が低く、汚れた空気を吸い続けると喘息やアレルギー症状を引き起こす可能性があります。お子様の健康とご自身の身体のために、定期的なクリーニングをおすすめします。',
-            both: '🧒🐾 お子様やペットは長時間エアコンの空気を吸い続けるため、健康への影響が心配です。ご家族とペットのために、定期的なクリーニングをおすすめします。',
-            none: '',
-        };
+        // ===== スコア帯ごとの基本コメント =====
+        function baseTexts(score) {
+            if (score >= 75) {
+                return [
+                    '定期的なお手入れができているようです。現状維持をオススメします！次の定期クリーニングまで大きな問題はなさそうです。',
+                    '綺麗にこだわりたい方は2年に1度、少なくとも3年に1度の分解洗浄をオススメします。',
+                ];
+            }
+            if (score >= 50) {
+                return [
+                    'そろそろクリーニングの時期が近づいているかもしれません。',
+                    'エアコン内部の汚れは見えないところから進みます。気になる症状が出る前の、定期的なクリーニングがオススメです。',
+                ];
+            }
+            if (score >= 30) {
+                return [
+                    '汚れと機能低下の兆しが見られます。早めのタイミングでのプロによるクリーニングをオススメします。',
+                ];
+            }
+            return [
+                '長期間のメンテナンス不足により、エアコン内部はかなり汚れているかもしれません。早めのプロによるクリーニングを強くオススメします。',
+            ];
+        }
+
+        // ===== 回答内容に応じた追加コメント =====
+        function symptomTexts() {
+            const texts = [];
+            const smellPts = answers.smell ? answers.smell.pts : 0;
+            const dustPts = answers.dust ? answers.dust.pts : 0;
+            const effPts = answers.efficiency ? answers.efficiency.pts : 0;
+
+            if (smellPts >= 2 || dustPts >= 2) {
+                texts.push('ニオイや黒いカスが出ている場合、内部でカビがかなり繁殖している可能性があります。エアコンの風にカビの胞子が混じると、喘息やアレルギー等の健康被害につながることもあります。');
+            } else if (smellPts >= 1 || dustPts >= 1) {
+                texts.push('ニオイやカビの兆候がある場合、内部でカビが繁殖し始めている可能性があります。');
+            }
+
+            // 通常分解・わからない経験者には完全分解の案内（キレイ度が高い人には出さない）
+            if (answers.lastType && answers.lastType.value !== 'full') {
+                texts.push('通常分解のクリーニングでは、奥やドレンパン部分に洗い残しが生じることがあります。徹底的に綺麗にしたい場合は、送風ファン・ドレンパンまで外して洗う「完全分解クリーニング」がオススメです。');
+            }
+
+            if (effPts >= 2) {
+                texts.push('効きが悪くなっている原因は、内部の汚れや室外機の汚れの可能性もあります。※室外機の清掃は電気代の削減にも繋がります。');
+            } else if (effPts >= 1) {
+                texts.push('効きが少し弱いと感じるときは、内部の汚れが影響し始めているサインかもしれません。');
+            }
+            return texts;
+        }
+
+        // ===== お子様・ペットの声かけコメント =====
+        function familyText() {
+            const hasChild = answers.child && answers.child.value === 'yes';
+            const hasPet = answers.pet && answers.pet.value === 'yes';
+            if (hasChild && hasPet) {
+                return '🧒🐾 お子様やペットは長時間エアコンの空気を吸い続けるため、健康への影響が心配です。ご家族とペットのために、定期的なクリーニングをおすすめします。';
+            }
+            if (hasChild) {
+                return '🧒 お子様は免疫力が低く、汚れた空気を吸い続けると喘息やアレルギー症状を引き起こす可能性があります。お子様の健康とご自身の身体のために、定期的なクリーニングをおすすめします。';
+            }
+            if (hasPet) {
+                return '🐾 ペットを飼っているとエアコンが汚れやすく、ペットは長時間エアコンの空気を吸い続けるため、健康を損なうことが多いです。ペットとご自身の身体のために、定期的なクリーニングをおすすめします。';
+            }
+            return '';
+        }
 
         // ===== 状態管理 =====
         let answers = {};
@@ -558,68 +592,37 @@
 
         const $ = (id) => document.getElementById(id);
 
-        // 次に出す質問キーを決める（分岐ロジック）
-        function nextQuestion() {
-            if (!answers.timing) return 'timing';
-            if (!answers.freq) return 'freq';
-            if (!answers.years) return 'years';
-            if (answers.timing === 'recent') {
-                if (!answers.lastType) return 'lastType';
+        // lastTypeはクリーニング経験者（1年以内・2年以内）のみ質問する
+        function shouldAsk(key) {
+            if (key === 'lastType') {
+                return answers.timing && (answers.timing.value === 'y1' || answers.timing.value === 'y2');
             }
-            if (!answers.smell) return 'smell';
-            if (!answers.cooling) return 'cooling';
-            if (!answers.pets) return 'pets';
+            return true;
+        }
+
+        function nextQuestion() {
+            for (const key of ORDER) {
+                if (!shouldAsk(key)) continue;
+                if (!answers[key]) return key;
+            }
             return null; // 全問終了
         }
 
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
-            return answers.timing === 'recent' ? 7 : 6;
+            const t = answers.timing;
+            if (t && (t.value === 'y1' || t.value === 'y2')) return 8;
+            return 7;
         }
 
-        // ルート判定（Miroの分岐表を再現）
-        function decideRoute() {
-            const a = answers;
-            if (a.timing === 'recent') {
-                if (a.lastType === 'full') return a.years === 'u2' ? 'A' : 'B';
-                return a.years === 'u2' ? 'B' : 'C';
+        // キレイ度 = 100 - 汚れ点数の割合（5%〜95%の範囲）
+        function calcScore() {
+            let total = 0;
+            for (const key of ORDER) {
+                if (answers[key]) total += answers[key].pts;
             }
-            if (a.years === 'u2') return 'B';
-            if (a.smell !== 'none') return 'D';
-            if (a.cooling === 'bad') return 'E';
-            return 'F';
-        }
-
-        // ニオイ・効きの回答によるキレイ度の減点（ルートで反映済みの分は除く）
-        function symptomModifier(route) {
-            const a = answers;
-            let mod = 0;
-            if (route !== 'D') {
-                if (a.smell === 'both') mod -= 15;
-                else if (a.smell === 'smell' || a.smell === 'mold') mod -= 10;
-            }
-            if (route !== 'E') {
-                if (a.cooling === 'bad') mod -= 10;
-                else if (a.cooling === 'slight') mod -= 5;
-            }
-            return mod;
-        }
-
-        // ニオイ・効きの追加コメント
-        function symptomTexts(route) {
-            const a = answers;
-            const texts = [];
-            if (route !== 'D' && a.smell !== 'none') {
-                texts.push('ニオイやカビが気になる場合、内部でカビが繁殖し始めている可能性があります。エアコンの風にカビの胞子が混じると、喘息やアレルギー等の健康被害につながることもあります。');
-            }
-            if (route !== 'E') {
-                if (a.cooling === 'bad') {
-                    texts.push('効きが悪い原因は、内部の汚れや室外機の汚れの可能性もあります。※室外機の清掃は電気代の削減にも繋がります。');
-                } else if (a.cooling === 'slight') {
-                    texts.push('効きが少し弱いと感じるときは、内部の汚れが影響し始めているサインかもしれません。');
-                }
-            }
-            return texts;
+            const score = 100 - Math.round((total / MAX_PTS) * 100);
+            return Math.max(5, Math.min(95, score));
         }
 
         function showQuestion(key) {
@@ -646,7 +649,7 @@
                 btn.className = 'choice-btn';
                 btn.textContent = c.label;
                 btn.addEventListener('click', () => {
-                    answers[key] = c.value;
+                    answers[key] = { value: c.value, pts: c.pts };
                     history.push(key);
                     advance();
                 });
@@ -671,9 +674,7 @@
         }
 
         function showResult() {
-            const route = decideRoute();
-            // ベース点＋症状による減点（5%〜85%の範囲に収める）
-            const score = Math.max(5, Math.min(85, SCORES[route][answers.pets] + symptomModifier(route)));
+            const score = calcScore();
             const emoji = score >= 75 ? '😍✨' : score >= 50 ? '🥺' : score >= 30 ? '😖' : '😱';
 
             $('questionCard').classList.add('hidden');
@@ -701,13 +702,13 @@
                 $('gaugeFill').style.width = `${score}%`;
             }, 100);
 
-            const texts = ROUTE_TEXT[route].concat(symptomTexts(route));
+            const texts = baseTexts(score).concat(symptomTexts());
             $('resultText').innerHTML = texts.map((t) => `<p>${t}</p>`).join('');
 
-            const petText = PET_TEXT[answers.pets];
+            const fam = familyText();
             const petBox = $('petBox');
-            if (petText) {
-                petBox.textContent = petText;
+            if (fam) {
+                petBox.textContent = fam;
                 petBox.classList.remove('hidden');
             } else {
                 petBox.classList.add('hidden');
@@ -720,9 +721,8 @@
             const lastKey = history.pop();
             if (lastKey === undefined) return;
             // 戻る質問以降の回答をすべて消す（分岐のズレを防ぐ）
-            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'smell', 'cooling', 'pets'];
-            const idx = keysOrder.indexOf(lastKey);
-            keysOrder.slice(idx).forEach((k) => delete answers[k]);
+            const idx = ORDER.indexOf(lastKey);
+            ORDER.slice(idx).forEach((k) => delete answers[k]);
             showQuestion(lastKey);
         }
 
