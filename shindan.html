@@ -275,36 +275,25 @@
             margin: 0 auto;
         }
 
-        .ring-wrap svg {
-            width: 150px;
-            height: 150px;
-            transform: rotate(-90deg);
+        .ring-fill {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 50%;
+            background: conic-gradient(from -90deg, var(--border) 0%, var(--border) 100%);
+            transition: background .2s linear;
         }
 
-        .ring-bg,
-        .ring-fg {
-            fill: none;
-            stroke-width: 14;
-            stroke-linecap: round;
-        }
-
-        .ring-bg {
-            stroke: var(--border);
-        }
-
-        .ring-fg {
-            stroke: var(--red);
-            stroke-dasharray: 364.4;
-            stroke-dashoffset: 364.4;
-            transition: stroke-dashoffset 1.1s ease;
-        }
-
-        .ring-fg.mid {
-            stroke: var(--orange);
-        }
-
-        .ring-fg.good {
-            stroke: var(--blue);
+        .ring-hole {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            border-radius: 50%;
+            background: var(--white);
         }
 
         .ring-center {
@@ -315,14 +304,6 @@
             justify-content: center;
             font-weight: 900;
             color: var(--red);
-        }
-
-        .ring-center.mid {
-            color: var(--orange);
-        }
-
-        .ring-center.good {
-            color: var(--blue);
         }
 
         .ring-center .num {
@@ -795,10 +776,8 @@
                     <div class="ring-block">
                         <p class="ring-label">あなたのエアコン<br>キレイ度</p>
                         <div class="ring-wrap">
-                            <svg viewBox="0 0 150 150">
-                                <circle class="ring-bg" cx="75" cy="75" r="58"></circle>
-                                <circle class="ring-fg" id="ringFg" cx="75" cy="75" r="58"></circle>
-                            </svg>
+                            <div class="ring-fill" id="ringFill"></div>
+                            <div class="ring-hole"></div>
                             <div class="ring-center" id="ringCenter">
                                 <span class="num" id="recNum">0</span><span class="pct">%</span>
                             </div>
@@ -1061,6 +1040,20 @@
             return `hsl(${hue}, 78%, 44%)`;
         }
 
+        // キレイ度に応じたリングのグラデーション（0%=赤 → キレイ度に応じて緑・黄 → 高いほど青に近づく）
+        function buildRingGradient(cleanScore) {
+            const steps = 8;
+            const stops = [];
+            for (let i = 0; i <= steps; i++) {
+                const pct = (cleanScore * i) / steps;
+                const hue = Math.round(pct * 2.1);
+                stops.push(`hsl(${hue}, 80%, 50%) ${pct.toFixed(1)}%`);
+            }
+            stops.push(`var(--border) ${cleanScore.toFixed(1)}%`);
+            stops.push(`var(--border) 100%`);
+            return `conic-gradient(from -90deg, ${stops.join(', ')})`;
+        }
+
         // ===== 気になったポイントの一覧を作る（減点が大きい順） =====
         function buildConcerns() {
             const items = [];
@@ -1179,25 +1172,19 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ（キレイ度を表示。数字が低いほど悪い＝赤、高いほど良い＝青）
-            const ringFg = $('ringFg');
+            // リングゲージ（キレイ度をグラデーションで表示。低い=赤 → 高いほど青に近づく）
+            const ringFill = $('ringFill');
             const ringCenter = $('ringCenter');
-            ringFg.className.baseVal = 'ring-fg';
-            ringCenter.className = 'ring-center';
-            ringFg.style.stroke = color;
             ringCenter.style.color = color;
-            const CIRC = 364.4;
-            setTimeout(() => {
-                ringFg.style.strokeDashoffset = CIRC * (1 - cleanScore / 100);
-            }, 100);
 
-            // 数字カウントアップ
+            // 数字カウントアップ＋リングのグラデーションを同時に伸ばす
             const numEl = $('recNum');
             let cur = 0;
             const step = Math.max(1, Math.round(cleanScore / 40));
             const timer = setInterval(() => {
                 cur = Math.min(cleanScore, cur + step);
                 numEl.textContent = cur;
+                ringFill.style.background = buildRingGradient(cur);
                 if (cur >= cleanScore) clearInterval(timer);
             }, 25);
 
@@ -1291,7 +1278,7 @@
             history = [];
             $('resultArea').classList.add('hidden');
             $('progressArea').style.display = 'none';
-            $('ringFg').style.strokeDashoffset = 364.4;
+            $('ringFill').style.background = buildRingGradient(0);
             $('recNum').textContent = '0';
             $('startCard').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
