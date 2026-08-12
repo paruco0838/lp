@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>エアコンキレイ度診断 | カジラク</title>
-    <meta name="description" content="質問に答えるだけで、あなたの家のエアコン内部のキレイ度をチェック！状態に合わせたおすすめのクリーニング方法もご紹介します。">
+    <meta name="description" content="質問に答えるだけで、あなたの家のエアコン内部のキレイ度をチェック！状態に合わせた解説・アドバイス付きの無料診断です。">
     <style>
         :root {
             --navy: #102840;
@@ -292,85 +292,6 @@
             margin-top: 14px;
         }
 
-        /* メニュー */
-        .menu-title {
-            font-size: 16px;
-            font-weight: 900;
-            color: var(--navy);
-            text-align: center;
-            margin-top: 8px;
-        }
-
-        .menu-card {
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 18px 16px;
-            margin-top: 14px;
-            position: relative;
-        }
-
-        .menu-card.recommend {
-            border-color: var(--orange);
-            background: #fff9f2;
-        }
-
-        .rec-badge {
-            position: absolute;
-            top: -12px;
-            left: 14px;
-            background: var(--orange);
-            color: #fff;
-            font-size: 11.5px;
-            font-weight: 900;
-            padding: 3px 12px;
-            border-radius: 999px;
-        }
-
-        .menu-name {
-            font-size: 15.5px;
-            font-weight: 900;
-            color: var(--navy);
-        }
-
-        .menu-desc {
-            font-size: 12.5px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            border-bottom: 1px dashed var(--border);
-            padding: 8px 2px;
-            font-size: 13.5px;
-        }
-
-        .price-row:last-of-type {
-            border-bottom: none;
-        }
-
-        .price-row .price {
-            font-size: 18px;
-            font-weight: 900;
-            color: var(--navy);
-        }
-
-        .price-row.strong .price {
-            color: var(--red);
-            font-size: 21px;
-        }
-
-        .option-note {
-            background: var(--sky);
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 12.5px;
-            margin-top: 14px;
-            color: var(--navy-2);
-        }
-
         /* CTA */
         .cta-area {
             text-align: center;
@@ -471,8 +392,8 @@
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部のキレイ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は全部で6問・約1分で完了</li>
-                <li>キレイ度に合わせたぴったりのクリーニング内容もご紹介</li>
+                <li>質問は全部で5問・約1分で完了</li>
+                <li>キレイ度に合わせた状態の解説・アドバイス付き</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
             <div class="cta-area">
@@ -499,17 +420,6 @@
             </div>
             <div class="result-text" id="resultText"></div>
             <div class="pet-box hidden" id="petBox"></div>
-        </div>
-
-        <!-- メニューカード -->
-        <div class="card hidden" id="menuCard">
-            <p class="menu-title">あなたにオススメの<br>クリーニングメニューはこちら✨</p>
-            <div id="menuList"></div>
-            <div class="option-note hidden" id="optionNote"></div>
-            <div class="cta-area">
-                <a class="btn-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">💬 LINEで写真を送って無料相談する</a>
-                <p class="cta-sub">写真を送るだけ / 相談だけOK / しつこい営業なし</p>
-            </div>
             <div style="text-align:center;">
                 <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
             </div>
@@ -577,15 +487,6 @@
                     { label: 'ペットも子供もいない', value: 'none' },
                 ],
             },
-            cleanFn: {
-                title: 'お使いのエアコンは「お掃除機能付き」ですか？',
-                note: '※料金の目安をお出しするための質問です。リモコンに「フィルター掃除」ボタンがあればお掃除機能付きの可能性が高いです',
-                choices: [
-                    { label: 'お掃除機能あり', value: 'yes' },
-                    { label: 'お掃除機能なし', value: 'no' },
-                    { label: 'わからない・複数台ある', value: 'unknown' },
-                ],
-            },
         };
 
         // ===== キレイ度スコア表（Miroの分岐を再現） =====
@@ -638,32 +539,6 @@
             none: '',
         };
 
-        // ===== メニュー定義（カジラクLPの料金） =====
-        const MENUS = {
-            standard: {
-                name: 'スタンダード洗浄',
-                desc: '費用を抑えて内部の汚れを洗浄。カバーを外して高圧洗浄します。',
-                priceNo: '8,500円',
-                priceYes: '15,500円',
-            },
-            full: {
-                name: '完全分解クリーニング',
-                desc: '送風ファン・ドレンパンまで外し、通常洗浄では届きにくい奥のカビ汚れまで徹底洗浄。',
-                priceNo: '18,500円',
-                priceYes: '25,500円',
-            },
-        };
-
-        // ルート別おすすめメニューとオプション案内
-        const ROUTE_MENU = {
-            A: { rec: 'standard', option: null },
-            B: { rec: 'standard', option: null },
-            C: { rec: 'full', option: null },
-            D: { rec: 'full', option: '🌿 カビのニオイが気になる方には「消臭抗菌・防カビコーティング」のオプションもご用意しています。詳しくはLINEでお気軽にご相談ください。' },
-            E: { rec: 'standard', option: '💨 室外機が汚れると負荷がかかり、消費電力の増加や故障の原因になることも。「室外機洗浄」のオプションもLINEでご相談いただけます。' },
-            F: { rec: 'standard', option: null },
-        };
-
         // ===== 状態管理 =====
         let answers = {};
         let history = [];
@@ -682,15 +557,14 @@
                 if (answers.years !== 'u2' && !answers.concern) return 'concern';
             }
             if (!answers.pets) return 'pets';
-            if (!answers.cleanFn) return 'cleanFn';
             return null; // 全問終了
         }
 
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
-            if (answers.timing === 'recent') return 6;
-            if (answers.timing && answers.years === 'u2') return 5;
-            return 6;
+            if (answers.timing === 'recent') return 5;
+            if (answers.timing && answers.years === 'u2') return 4;
+            return 5;
         }
 
         // ルート判定（Miroの分岐表を再現）
@@ -710,7 +584,6 @@
             const q = QUESTIONS[key];
             $('startCard').classList.add('hidden');
             $('resultCard').classList.add('hidden');
-            $('menuCard').classList.add('hidden');
             const card = $('questionCard');
             card.classList.remove('hidden');
             card.classList.remove('fade-in');
@@ -796,60 +669,14 @@
                 petBox.classList.add('hidden');
             }
 
-            showMenu(route);
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showMenu(route) {
-            const { rec, option } = ROUTE_MENU[route];
-            const mCard = $('menuCard');
-            mCard.classList.remove('hidden');
-            mCard.classList.add('fade-in');
-
-            const order = rec === 'full' ? ['full', 'standard'] : ['standard', 'full'];
-            const list = $('menuList');
-            list.innerHTML = '';
-
-            order.forEach((menuKey) => {
-                const m = MENUS[menuKey];
-                const isRec = menuKey === rec;
-                const div = document.createElement('div');
-                div.className = 'menu-card' + (isRec ? ' recommend' : '');
-
-                // お掃除機能の回答に合わせて料金表示
-                let rows = '';
-                if (answers.cleanFn === 'no') {
-                    rows = `<div class="price-row strong"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>
-                            <div class="price-row"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>`;
-                } else if (answers.cleanFn === 'yes') {
-                    rows = `<div class="price-row strong"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>
-                            <div class="price-row"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>`;
-                } else {
-                    rows = `<div class="price-row"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>
-                            <div class="price-row"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>`;
-                }
-
-                div.innerHTML = `${isRec ? '<span class="rec-badge">あなたへのおすすめ</span>' : ''}
-                    <p class="menu-name">${m.name}</p>
-                    <p class="menu-desc">${m.desc}</p>
-                    ${rows}`;
-                list.appendChild(div);
-            });
-
-            const optEl = $('optionNote');
-            if (option) {
-                optEl.textContent = option;
-                optEl.classList.remove('hidden');
-            } else {
-                optEl.classList.add('hidden');
-            }
         }
 
         function goBack() {
             const lastKey = history.pop();
             if (lastKey === undefined) return;
             // 戻る質問以降の回答をすべて消す（分岐のズレを防ぐ）
-            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'concern', 'pets', 'cleanFn'];
+            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'concern', 'pets'];
             const idx = keysOrder.indexOf(lastKey);
             keysOrder.slice(idx).forEach((k) => delete answers[k]);
             showQuestion(lastKey);
@@ -859,7 +686,6 @@
             answers = {};
             history = [];
             $('resultCard').classList.add('hidden');
-            $('menuCard').classList.add('hidden');
             $('progressArea').style.display = 'none';
             $('gaugeFill').style.width = '0';
             $('startCard').classList.remove('hidden');
