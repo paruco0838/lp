@@ -303,8 +303,8 @@
             stroke: var(--orange);
         }
 
-        .ring-fg.low {
-            stroke: var(--line);
+        .ring-fg.good {
+            stroke: var(--blue);
         }
 
         .ring-center {
@@ -321,8 +321,8 @@
             color: var(--orange);
         }
 
-        .ring-center.low {
-            color: var(--line-dark);
+        .ring-center.good {
+            color: var(--blue);
         }
 
         .ring-center .num {
@@ -343,15 +343,7 @@
         .score-msg .msg-label {
             font-size: 14px;
             font-weight: 900;
-            color: var(--red);
-        }
-
-        .score-msg .msg-label.mid {
-            color: var(--orange);
-        }
-
-        .score-msg .msg-label.low {
-            color: var(--line-dark);
+            color: var(--navy-2);
         }
 
         .score-msg .msg-level {
@@ -372,14 +364,14 @@
         }
 
         .score-msg .msg-level .lv.low {
-            color: var(--line-dark);
+            color: var(--blue);
         }
 
         .warn-box {
             display: flex;
             gap: 10px;
             align-items: flex-start;
-            background: var(--red-bg);
+            background: var(--sky);
             border-radius: 12px;
             padding: 12px 14px;
             font-size: 13px;
@@ -409,7 +401,7 @@
         }
 
         .sec-badge.red {
-            background: var(--red);
+            background: var(--blue);
         }
 
         /* 気になったポイント */
@@ -429,7 +421,7 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: var(--red);
+            background: var(--blue);
             color: #fff;
             font-size: 13px;
             display: flex;
@@ -458,7 +450,7 @@
         }
 
         .rec-title .accent {
-            color: var(--red);
+            color: var(--blue);
         }
 
         .rec-lead {
@@ -467,7 +459,7 @@
         }
 
         .rec-reasons {
-            background: #fff5f4;
+            background: var(--sky);
             border-radius: 12px;
             padding: 14px 16px;
             margin-top: 12px;
@@ -476,7 +468,7 @@
         .rec-reasons .rr-title {
             font-size: 13px;
             font-weight: 900;
-            color: var(--red);
+            color: var(--blue);
             margin-bottom: 4px;
         }
 
@@ -496,7 +488,7 @@
         }
 
         .family-box {
-            background: var(--mint);
+            background: var(--sky);
             border-radius: 12px;
             padding: 12px 14px;
             font-size: 13px;
@@ -532,8 +524,8 @@
         }
 
         .vs-card.full {
-            border-color: var(--red);
-            background: #fffafa;
+            border-color: var(--blue);
+            background: #f5faff;
         }
 
         .vs-tag {
@@ -542,14 +534,14 @@
             font-size: 12.5px;
             font-weight: 900;
             color: #fff;
-            background: var(--blue);
+            background: var(--navy-2);
             border-radius: 999px;
             padding: 3px 10px;
             margin-bottom: 10px;
         }
 
         .vs-card.full .vs-tag {
-            background: var(--red);
+            background: var(--blue);
         }
 
         .vs-card li {
@@ -565,12 +557,12 @@
             content: "✔";
             position: absolute;
             left: 0;
-            color: var(--blue);
+            color: var(--navy-2);
             font-weight: 900;
         }
 
         .vs-card.full li::before {
-            color: var(--red);
+            color: var(--blue);
         }
 
         .vs-desc {
@@ -654,14 +646,14 @@
         .btn-red {
             display: block;
             width: 100%;
-            background: var(--red);
+            background: linear-gradient(135deg, var(--blue), #1f78b8);
             color: #fff;
             font-size: 16.5px;
             font-weight: 900;
             text-decoration: none;
             border-radius: 999px;
             padding: 16px 12px;
-            box-shadow: 0 6px 16px rgba(217, 73, 63, .35);
+            box-shadow: 0 6px 16px rgba(45, 143, 213, .4);
             transition: opacity .15s;
             margin-top: 14px;
         }
@@ -769,7 +761,7 @@
         <!-- スタート画面 -->
         <div class="card" id="startCard">
             <div class="start-emoji">🍃</div>
-            <p class="start-title">あなたの家のエアコン、<br>お掃除おすすめ度は何%？</p>
+            <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
             <ul class="start-points">
                 <li>質問は最大7問・約1分で完了</li>
@@ -801,7 +793,7 @@
             <div class="card">
                 <div class="score-flex">
                     <div class="ring-block">
-                        <p class="ring-label">あなたのエアコン<br>お掃除おすすめ度</p>
+                        <p class="ring-label">あなたのエアコン<br>キレイ度</p>
                         <div class="ring-wrap">
                             <svg viewBox="0 0 150 150">
                                 <circle class="ring-bg" cx="75" cy="75" r="58"></circle>
@@ -1165,7 +1157,8 @@
         }
 
         function showResult() {
-            const score = calcRecScore();
+            const score = calcRecScore();          // お掃除おすすめ度（コメント・レベル判定用）
+            const cleanScore = 100 - score;        // キレイ度（グラフ表示用）
             const level = levelOf(score);
             const concerns = buildConcerns();
             const sympN = symptomCount();
@@ -1178,28 +1171,28 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ
+            // リングゲージ（キレイ度を表示。高いほど青、低いほど赤）
+            const ringCls = cleanScore >= 70 ? 'good' : cleanScore >= 40 ? 'mid' : '';
             const ringFg = $('ringFg');
             const ringCenter = $('ringCenter');
-            ringFg.className.baseVal = 'ring-fg ' + level.cls;
-            ringCenter.className = 'ring-center ' + level.cls;
+            ringFg.className.baseVal = 'ring-fg ' + ringCls;
+            ringCenter.className = 'ring-center ' + ringCls;
             const CIRC = 364.4;
             setTimeout(() => {
-                ringFg.style.strokeDashoffset = CIRC * (1 - score / 100);
+                ringFg.style.strokeDashoffset = CIRC * (1 - cleanScore / 100);
             }, 100);
 
             // 数字カウントアップ
             const numEl = $('recNum');
             let cur = 0;
-            const step = Math.max(1, Math.round(score / 40));
+            const step = Math.max(1, Math.round(cleanScore / 40));
             const timer = setInterval(() => {
-                cur = Math.min(score, cur + step);
+                cur = Math.min(cleanScore, cur + step);
                 numEl.textContent = cur;
-                if (cur >= score) clearInterval(timer);
+                if (cur >= cleanScore) clearInterval(timer);
             }, 25);
 
-            // レベル表示
-            $('msgLabel').className = 'msg-label ' + level.cls;
+            // レベル表示（クリーニングおすすめ度）
             $('msgLevel').innerHTML = `<span class="lv ${level.cls}">${level.text}</span>です！`;
 
             // 状況メッセージ
