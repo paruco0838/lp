@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エアコンキレイ度診断 | カジラク</title>
+    <meta name="description" content="質問に答えるだけで、あなたの家のエアコン内部のキレイ度をチェック！状態に合わせたおすすめのクリーニング方法もご紹介します。">
+    <style>
+        :root {
+            --navy: #102840;
+            --navy-2: #173b5d;
+            --blue: #2d8fd5;
+            --sky: #eaf6ff;
+            --mint: #e8f8f0;
+            --line: #06c755;
+            --line-dark: #049640;
+            --orange: #f28b25;
+            --red: #d9493f;
+            --ink: #1e2933;
+            --muted: #607080;
+            --border: #dce5ec;
+            --bg: #f6fbff;
+            --white: #ffffff;
+            --shadow: 0 12px 32px rgba(16, 40, 64, 0.13);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, "system-ui", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 16px 16px 48px;
+        }
+
+        /* ヘッダー */
+        .site-header {
+            text-align: center;
+            padding: 18px 0 6px;
+        }
+
+        .site-header .area-badge {
+            display: inline-block;
+            background: var(--sky);
+            color: var(--navy-2);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+        }
+
+        .site-header h1 {
+            font-size: 22px;
+            color: var(--navy);
+            font-weight: 900;
+            line-height: 1.4;
+        }
+
+        .site-header p.lead {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* カード共通 */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 24px 20px;
+            margin-top: 16px;
+        }
+
+        /* プログレスバー */
+        .progress-area {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--blue);
+            text-align: right;
+            margin-bottom: 4px;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--blue), #55b1ee);
+            border-radius: 999px;
+            transition: width .35s ease;
+        }
+
+        /* スタート画面 */
+        .start-emoji {
+            font-size: 44px;
+            text-align: center;
+        }
+
+        .start-title {
+            font-size: 19px;
+            font-weight: 900;
+            color: var(--navy);
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .start-text {
+            font-size: 14px;
+            color: var(--ink);
+            margin-top: 12px;
+        }
+
+        .start-points {
+            background: var(--sky);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 14px;
+            font-size: 13.5px;
+        }
+
+        .start-points li {
+            list-style: none;
+            padding-left: 1.6em;
+            position: relative;
+            margin: 4px 0;
+        }
+
+        .start-points li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        /* 質問 */
+        .q-number {
+            display: inline-block;
+            background: var(--navy);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 999px;
+        }
+
+        .q-title {
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--navy);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .q-note {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .choices {
+            margin-top: 16px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            transition: border-color .15s, background .15s, transform .1s;
+            font-family: inherit;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--blue);
+            background: var(--sky);
+        }
+
+        .choice-btn:active {
+            transform: scale(.98);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            font-family: inherit;
+        }
+
+        /* 結果 */
+        .result-heading {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .result-emoji {
+            font-size: 48px;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .score-num {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--navy);
+            margin-top: 4px;
+        }
+
+        .score-num .big {
+            font-size: 52px;
+            color: var(--blue);
+            line-height: 1.1;
+        }
+
+        .score-num .big.low {
+            color: var(--red);
+        }
+
+        .score-num .big.mid {
+            color: var(--orange);
+        }
+
+        .gauge {
+            height: 14px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--red), var(--orange), #f5c518, var(--line));
+            transition: width 1s ease;
+        }
+
+        .result-text {
+            font-size: 14px;
+            margin-top: 18px;
+        }
+
+        .result-text p+p {
+            margin-top: 10px;
+        }
+
+        .pet-box {
+            background: var(--mint);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 13.5px;
+            margin-top: 14px;
+        }
+
+        /* メニュー */
+        .menu-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--navy);
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .menu-card {
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 16px;
+            margin-top: 14px;
+            position: relative;
+        }
+
+        .menu-card.recommend {
+            border-color: var(--orange);
+            background: #fff9f2;
+        }
+
+        .rec-badge {
+            position: absolute;
+            top: -12px;
+            left: 14px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 900;
+            padding: 3px 12px;
+            border-radius: 999px;
+        }
+
+        .menu-name {
+            font-size: 15.5px;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        .menu-desc {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dashed var(--border);
+            padding: 8px 2px;
+            font-size: 13.5px;
+        }
+
+        .price-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .price-row .price {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        .price-row.strong .price {
+            color: var(--red);
+            font-size: 21px;
+        }
+
+        .option-note {
+            background: var(--sky);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 12.5px;
+            margin-top: 14px;
+            color: var(--navy-2);
+        }
+
+        /* CTA */
+        .cta-area {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-line {
+            display: block;
+            width: 100%;
+            background: var(--line);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 900;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 16px 12px;
+            box-shadow: 0 6px 16px rgba(6, 199, 85, .35);
+            transition: background .15s;
+        }
+
+        .btn-line:hover {
+            background: var(--line-dark);
+        }
+
+        .cta-sub {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .restart-btn {
+            display: inline-block;
+            margin-top: 18px;
+            background: none;
+            border: 2px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 22px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .restart-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn .3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="site-header">
+            <span class="area-badge">📍 大阪・兵庫エリア対応 / 出張費無料</span>
+            <h1>エアコンキレイ度診断</h1>
+            <p class="lead">カジラク | エアコンクリーニング</p>
+        </header>
+
+        <!-- プログレス -->
+        <div class="progress-area" id="progressArea">
+            <div class="progress-label" id="progressLabel"></div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- スタート画面 -->
+        <div class="card" id="startCard">
+            <div class="start-emoji">🍃</div>
+            <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
+            <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部のキレイ度をチェックします✨</p>
+            <ul class="start-points">
+                <li>質問は全部で6問・約1分で完了</li>
+                <li>キレイ度に合わせたぴったりのクリーニング内容もご紹介</li>
+                <li>個人情報の入力は不要です</li>
+            </ul>
+            <div class="cta-area">
+                <button class="btn-line" id="startBtn" type="button">早速診断スタート 👇</button>
+            </div>
+        </div>
+
+        <!-- 質問カード -->
+        <div class="card hidden" id="questionCard">
+            <span class="q-number" id="qNumber"></span>
+            <p class="q-title" id="qTitle"></p>
+            <p class="q-note" id="qNote"></p>
+            <div class="choices" id="choices"></div>
+            <button class="back-link" id="backBtn" type="button">← 1つ前に戻る</button>
+        </div>
+
+        <!-- 結果カード -->
+        <div class="card hidden" id="resultCard">
+            <p class="result-heading">ご回答ありがとうございました！<br>あなたの家のエアコンは…</p>
+            <div class="result-emoji" id="resultEmoji"></div>
+            <p class="score-num">キレイ度 <span class="big" id="scoreNum">0</span>%</p>
+            <div class="gauge">
+                <div class="gauge-fill" id="gaugeFill"></div>
+            </div>
+            <div class="result-text" id="resultText"></div>
+            <div class="pet-box hidden" id="petBox"></div>
+        </div>
+
+        <!-- メニューカード -->
+        <div class="card hidden" id="menuCard">
+            <p class="menu-title">あなたにオススメの<br>クリーニングメニューはこちら✨</p>
+            <div id="menuList"></div>
+            <div class="option-note hidden" id="optionNote"></div>
+            <div class="cta-area">
+                <a class="btn-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">💬 LINEで写真を送って無料相談する</a>
+                <p class="cta-sub">写真を送るだけ / 相談だけOK / しつこい営業なし</p>
+            </div>
+            <div style="text-align:center;">
+                <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
+            </div>
+        </div>
+
+        <p class="disclaimer">※本診断は使用状況からの目安です。実際の汚れ具合は写真や訪問時に確認いたします。</p>
+    </div>
+
+    <script>
+        // ===== 質問の定義 =====
+        const QUESTIONS = {
+            timing: {
+                title: '最後にエアコンクリーニングを頼んだのはいつですか？',
+                note: '※プロ業者によるクリーニングのみ。セルフクリーニングは除きます',
+                choices: [
+                    { label: '最近頼んだ（1〜2年未満）', value: 'recent' },
+                    { label: '2年以上前', value: 'old' },
+                    { label: '頼んだことはない', value: 'never' },
+                ],
+            },
+            freq: {
+                title: 'エアコンを使用する頻度はどれくらいですか？',
+                note: '',
+                choices: [
+                    { label: '一年中使用する', value: 'all' },
+                    { label: '夏のみ使用する', value: 'summer' },
+                    { label: '夏と冬に使用する', value: 'both' },
+                ],
+            },
+            years: {
+                title: 'エアコン購入後の利用年数はどれくらいですか？',
+                note: '',
+                choices: [
+                    { label: '2年未満', value: 'u2' },
+                    { label: '2〜4年', value: 'y24' },
+                    { label: '4年以上', value: 'o4' },
+                ],
+            },
+            lastType: {
+                title: '前回のクリーニングは、通常分解・完全分解のどちらでしたか？',
+                note: '※ほとんどの方が通常分解の洗浄です。完全分解はごく少数の方が選んでいます',
+                choices: [
+                    { label: '通常分解', value: 'normal' },
+                    { label: '完全分解', value: 'full' },
+                    { label: 'わからない', value: 'unknown' },
+                ],
+            },
+            concern: {
+                title: 'エアコンに関して気になることはありますか？',
+                note: '',
+                choices: [
+                    { label: '空気が臭う気がする', value: 'smell' },
+                    { label: '冷えが悪く感じる', value: 'cooling' },
+                    { label: '吹き出し口にカビが見える', value: 'mold' },
+                    { label: '特に気になることはない', value: 'none' },
+                ],
+            },
+            pets: {
+                title: '最後に、ご自宅にペットやお子様はいらっしゃいますか？',
+                note: '',
+                choices: [
+                    { label: 'ペットのみ飼っている', value: 'pet' },
+                    { label: '子供のみいる', value: 'child' },
+                    { label: '両方いる', value: 'both' },
+                    { label: 'ペットも子供もいない', value: 'none' },
+                ],
+            },
+            cleanFn: {
+                title: 'お使いのエアコンは「お掃除機能付き」ですか？',
+                note: '※料金の目安をお出しするための質問です。リモコンに「フィルター掃除」ボタンがあればお掃除機能付きの可能性が高いです',
+                choices: [
+                    { label: 'お掃除機能あり', value: 'yes' },
+                    { label: 'お掃除機能なし', value: 'no' },
+                    { label: 'わからない・複数台ある', value: 'unknown' },
+                ],
+            },
+        };
+
+        // ===== キレイ度スコア表（Miroの分岐を再現） =====
+        const SCORES = {
+            A: { pet: 75, child: 80, both: 75, none: 85 },   // 完全分解でクリーニング済み
+            B: { pet: 50, child: 60, both: 50, none: 60 },   // クリーニング済み・2年経過目安
+            C: { pet: 40, child: 45, both: 35, none: 50 },   // 通常分解＋年数経過
+            D: { pet: 10, child: 10, both: 10, none: 20 },   // 臭い・カビが気になる
+            E: { pet: 10, child: 10, both: 20, none: 30 },   // 冷えが悪い
+            F: { pet: 30, child: 30, both: 30, none: 30 },   // 長期間未クリーニング（自覚症状なし）
+        };
+
+        // ===== ルート別の診断コメント =====
+        const ROUTE_TEXT = {
+            A: [
+                '定期的なお掃除が行われているため、現状維持をオススメします。次の定期クリーニングまで問題はなさそうです。',
+                'ただ、前回のクリーニングから2年ほど経っている場合は、そろそろエアコンクリーニングを検討した方が良いかもしれません。',
+                '綺麗にこだわりたい方は2年に1度、少なくとも3年に1度の分解洗浄をオススメします。',
+            ],
+            B: [
+                '前回のクリーニング（またはご購入）から2年ほど経っていたら、そろそろクリーニングの時期かもしれません。',
+                'エアコンが汚れていると、エアコンから出る風にカビの胞子が混じるようになり、喘息やアレルギー等の健康被害を起こしやすくなります。',
+            ],
+            C: [
+                '通常分解でのクリーニングの場合、奥やドレンパン部分に洗い残しが生じてしまいます。',
+                'そのため、クリーニングをしても臭いが取りきれないことがあり、取りきれなかったカビが次第に繁殖することがあります。',
+                '送風ファン・ドレンパンまで外して洗う「完全分解クリーニング」をオススメします。',
+            ],
+            D: [
+                '汚れと機能低下の兆しが見られます。早いタイミングでのプロによるクリーニングをオススメします。',
+                'エアコンが汚れていると、エアコンから出る風にカビの胞子が混じるようになり、喘息やアレルギー等の健康被害を起こしやすくなります。',
+                'カビ臭さや黒い汚れが気になる場合は、奥まで徹底洗浄できる「完全分解クリーニング」がオススメです。',
+            ],
+            E: [
+                '長期間のメンテナンス不足により、エアコンはかなり汚れているかもしれません。',
+                'また、冷えが悪い原因は室外機の汚れの可能性もあるため、早めのプロによるクリーニングをオススメします。',
+                '※室外機の清掃は電気代の削減にも繋がります。',
+            ],
+            F: [
+                '長期間のメンテナンス不足により、エアコンはかなり汚れているかもしれません。',
+                'エアコンが汚れていると、喘息やアレルギー等の健康被害を起こしやすくなります。ご自身やご家族の身体のために、定期的なクリーニングをオススメします。',
+            ],
+        };
+
+        // ===== ペット・お子様の追加コメント =====
+        const PET_TEXT = {
+            pet: '🐾 ペットを飼っているとエアコンが汚れやすく、ペットは長時間エアコンの空気を吸い続けるため、健康を損なうことが多いです。ペットとご自身の身体のために、定期的なクリーニングをおすすめします。',
+            child: '🧒 お子様は免疫力が低く、汚れた空気を吸い続けると喘息やアレルギー症状を引き起こす可能性があります。お子様の健康とご自身の身体のために、定期的なクリーニングをおすすめします。',
+            both: '🧒🐾 お子様やペットは長時間エアコンの空気を吸い続けるため、健康への影響が心配です。ご家族とペットのために、定期的なクリーニングをおすすめします。',
+            none: '',
+        };
+
+        // ===== メニュー定義（カジラクLPの料金） =====
+        const MENUS = {
+            standard: {
+                name: 'スタンダード洗浄',
+                desc: '費用を抑えて内部の汚れを洗浄。カバーを外して高圧洗浄します。',
+                priceNo: '8,500円',
+                priceYes: '15,500円',
+            },
+            full: {
+                name: '完全分解クリーニング',
+                desc: '送風ファン・ドレンパンまで外し、通常洗浄では届きにくい奥のカビ汚れまで徹底洗浄。',
+                priceNo: '18,500円',
+                priceYes: '25,500円',
+            },
+        };
+
+        // ルート別おすすめメニューとオプション案内
+        const ROUTE_MENU = {
+            A: { rec: 'standard', option: null },
+            B: { rec: 'standard', option: null },
+            C: { rec: 'full', option: null },
+            D: { rec: 'full', option: '🌿 カビのニオイが気になる方には「消臭抗菌・防カビコーティング」のオプションもご用意しています。詳しくはLINEでお気軽にご相談ください。' },
+            E: { rec: 'standard', option: '💨 室外機が汚れると負荷がかかり、消費電力の増加や故障の原因になることも。「室外機洗浄」のオプションもLINEでご相談いただけます。' },
+            F: { rec: 'standard', option: null },
+        };
+
+        // ===== 状態管理 =====
+        let answers = {};
+        let history = [];
+
+        const $ = (id) => document.getElementById(id);
+
+        // 次に出す質問キーを決める（分岐ロジック）
+        function nextQuestion() {
+            if (!answers.timing) return 'timing';
+            if (!answers.freq) return 'freq';
+            if (!answers.years) return 'years';
+            if (answers.timing === 'recent') {
+                if (!answers.lastType) return 'lastType';
+            } else {
+                // 購入2年未満は症状質問をスキップ（Miroの分岐どおり）
+                if (answers.years !== 'u2' && !answers.concern) return 'concern';
+            }
+            if (!answers.pets) return 'pets';
+            if (!answers.cleanFn) return 'cleanFn';
+            return null; // 全問終了
+        }
+
+        // 全体の質問数（分岐で変わる）
+        function totalQuestions() {
+            if (answers.timing === 'recent') return 6;
+            if (answers.timing && answers.years === 'u2') return 5;
+            return 6;
+        }
+
+        // ルート判定（Miroの分岐表を再現）
+        function decideRoute() {
+            const a = answers;
+            if (a.timing === 'recent') {
+                if (a.lastType === 'full') return a.years === 'u2' ? 'A' : 'B';
+                return a.years === 'u2' ? 'B' : 'C';
+            }
+            if (a.years === 'u2') return 'B';
+            if (a.concern === 'smell' || a.concern === 'mold') return 'D';
+            if (a.concern === 'cooling') return 'E';
+            return 'F';
+        }
+
+        function showQuestion(key) {
+            const q = QUESTIONS[key];
+            $('startCard').classList.add('hidden');
+            $('resultCard').classList.add('hidden');
+            $('menuCard').classList.add('hidden');
+            const card = $('questionCard');
+            card.classList.remove('hidden');
+            card.classList.remove('fade-in');
+            void card.offsetWidth;
+            card.classList.add('fade-in');
+
+            const num = history.length + 1;
+            $('qNumber').textContent = `質問 ${num} / ${totalQuestions()}`;
+            $('qTitle').textContent = q.title;
+            $('qNote').textContent = q.note;
+            $('qNote').style.display = q.note ? '' : 'none';
+
+            const box = $('choices');
+            box.innerHTML = '';
+            q.choices.forEach((c) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'choice-btn';
+                btn.textContent = c.label;
+                btn.addEventListener('click', () => {
+                    answers[key] = c.value;
+                    history.push(key);
+                    advance();
+                });
+                box.appendChild(btn);
+            });
+
+            $('backBtn').style.display = history.length ? '' : 'none';
+
+            // プログレス更新
+            $('progressArea').style.display = 'block';
+            $('progressLabel').textContent = `質問 ${num} / ${totalQuestions()}`;
+            $('progressFill').style.width = `${((num - 1) / totalQuestions()) * 100}%`;
+        }
+
+        function advance() {
+            const key = nextQuestion();
+            if (key) {
+                showQuestion(key);
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const route = decideRoute();
+            const score = SCORES[route][answers.pets];
+            const emoji = score >= 75 ? '😍✨' : score >= 50 ? '🥺' : score >= 30 ? '😖' : '😱';
+
+            $('questionCard').classList.add('hidden');
+            $('progressFill').style.width = '100%';
+            $('progressLabel').textContent = '診断完了！';
+
+            const rCard = $('resultCard');
+            rCard.classList.remove('hidden');
+            rCard.classList.add('fade-in');
+            $('resultEmoji').textContent = emoji;
+
+            const numEl = $('scoreNum');
+            numEl.className = 'big ' + (score >= 75 ? '' : score >= 50 ? 'mid' : 'low');
+
+            // 数字カウントアップ
+            let cur = 0;
+            const step = Math.max(1, Math.round(score / 40));
+            const timer = setInterval(() => {
+                cur = Math.min(score, cur + step);
+                numEl.textContent = cur;
+                if (cur >= score) clearInterval(timer);
+            }, 25);
+
+            setTimeout(() => {
+                $('gaugeFill').style.width = `${score}%`;
+            }, 100);
+
+            $('resultText').innerHTML = ROUTE_TEXT[route].map((t) => `<p>${t}</p>`).join('');
+
+            const petText = PET_TEXT[answers.pets];
+            const petBox = $('petBox');
+            if (petText) {
+                petBox.textContent = petText;
+                petBox.classList.remove('hidden');
+            } else {
+                petBox.classList.add('hidden');
+            }
+
+            showMenu(route);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showMenu(route) {
+            const { rec, option } = ROUTE_MENU[route];
+            const mCard = $('menuCard');
+            mCard.classList.remove('hidden');
+            mCard.classList.add('fade-in');
+
+            const order = rec === 'full' ? ['full', 'standard'] : ['standard', 'full'];
+            const list = $('menuList');
+            list.innerHTML = '';
+
+            order.forEach((menuKey) => {
+                const m = MENUS[menuKey];
+                const isRec = menuKey === rec;
+                const div = document.createElement('div');
+                div.className = 'menu-card' + (isRec ? ' recommend' : '');
+
+                // お掃除機能の回答に合わせて料金表示
+                let rows = '';
+                if (answers.cleanFn === 'no') {
+                    rows = `<div class="price-row strong"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>
+                            <div class="price-row"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>`;
+                } else if (answers.cleanFn === 'yes') {
+                    rows = `<div class="price-row strong"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>
+                            <div class="price-row"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>`;
+                } else {
+                    rows = `<div class="price-row"><span>壁掛け通常タイプ</span><span class="price">${m.priceNo}</span></div>
+                            <div class="price-row"><span>お掃除機能付き</span><span class="price">${m.priceYes}</span></div>`;
+                }
+
+                div.innerHTML = `${isRec ? '<span class="rec-badge">あなたへのおすすめ</span>' : ''}
+                    <p class="menu-name">${m.name}</p>
+                    <p class="menu-desc">${m.desc}</p>
+                    ${rows}`;
+                list.appendChild(div);
+            });
+
+            const optEl = $('optionNote');
+            if (option) {
+                optEl.textContent = option;
+                optEl.classList.remove('hidden');
+            } else {
+                optEl.classList.add('hidden');
+            }
+        }
+
+        function goBack() {
+            const lastKey = history.pop();
+            if (lastKey === undefined) return;
+            // 戻る質問以降の回答をすべて消す（分岐のズレを防ぐ）
+            const keysOrder = ['timing', 'freq', 'years', 'lastType', 'concern', 'pets', 'cleanFn'];
+            const idx = keysOrder.indexOf(lastKey);
+            keysOrder.slice(idx).forEach((k) => delete answers[k]);
+            showQuestion(lastKey);
+        }
+
+        function restart() {
+            answers = {};
+            history = [];
+            $('resultCard').classList.add('hidden');
+            $('menuCard').classList.add('hidden');
+            $('progressArea').style.display = 'none';
+            $('gaugeFill').style.width = '0';
+            $('startCard').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        $('startBtn').addEventListener('click', advance);
+        $('backBtn').addEventListener('click', goBack);
+        $('restartBtn').addEventListener('click', restart);
+    </script>
+</body>
+
+</html>
