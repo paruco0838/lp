@@ -876,10 +876,10 @@
                 title: '前回エアコンクリーニングをしたのはいつ頃ですか？',
                 note: '※プロ業者によるクリーニングのみ。セルフクリーニングは除きます',
                 choices: [
-                    { label: '1年以内', value: 'y1', pts: 0 },
-                    { label: '2年以内', value: 'y2', pts: 1 },
-                    { label: '3年以上前', value: 'y3', pts: 2 },
-                    { label: 'したことがない・覚えていない', value: 'never', pts: 3 },
+                    { label: '2年未満', value: 'u2', pts: 0 },
+                    { label: '2〜4年以内', value: 'y24', pts: 2 },
+                    { label: '4年以上', value: 'o4', pts: 4 },
+                    { label: 'したことがない', value: 'never', pts: 5 },
                 ],
             },
             lastType: {
@@ -897,8 +897,8 @@
                 choices: [
                     { label: '1年未満', value: 'u1', pts: 0 },
                     { label: '1〜3年', value: 'y13', pts: 1 },
-                    { label: '4〜7年', value: 'y47', pts: 2 },
-                    { label: '8年以上', value: 'o8', pts: 3 },
+                    { label: '4〜6年', value: 'y46', pts: 2 },
+                    { label: '7年以上', value: 'o7', pts: 3 },
                 ],
             },
             smell: {
@@ -945,9 +945,9 @@
         // ===== 「気になったポイント」の文言（回答ごと） =====
         const CONCERNS = {
             timing: {
-                y2: { title: '前回のクリーニングから2年近く経過', desc: '内部に汚れがたまり始めている時期です。' },
-                y3: { title: '3年以上クリーニングしていない', desc: '長期間お掃除していないため、汚れがたまりやすい状態です。' },
-                never: { title: 'クリーニングをしたことがない', desc: '使用開始からの汚れがそのまま内部に蓄積している可能性があります。' },
+                y24: { title: '前回のクリーニングから2〜4年経過', desc: '内部に汚れがたまり始めている時期です。' },
+                o4: { title: '4年以上クリーニングしていない', desc: '長期間お掃除していないため、内部にカビやホコリがかなり蓄積している可能性が高い状態です。' },
+                never: { title: 'クリーニングを一度もしたことがない', desc: '使用開始からの汚れがそのまま内部に蓄積しています。早めのクリーニングを強くおすすめします。' },
             },
             lastType: {
                 normal: { title: '前回は通常分解クリーニング', desc: '奥やドレンパン部分に洗い残しが残っている場合があります。' },
@@ -955,8 +955,8 @@
             },
             years: {
                 y13: { title: '使用年数が1〜3年', desc: '内部に汚れがたまり始める時期です。' },
-                y47: { title: '使用年数が4〜7年', desc: 'ホコリやカビがたまりやすくなる時期です。' },
-                o8: { title: '使用年数が8年以上', desc: '長年の使用で内部の汚れが蓄積しやすい状態です。' },
+                y46: { title: '使用年数が4〜6年', desc: 'ホコリやカビがたまりやすくなる時期です。' },
+                o7: { title: '使用年数が7年以上', desc: '長年の使用で内部の汚れが蓄積しやすい状態です。' },
             },
             smell: {
                 later: { title: 'つけ始めのニオイが気になる', desc: '内部でカビが発生し始めているサインかもしれません。' },
@@ -980,8 +980,8 @@
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
         const ORDER = ['timing', 'lastType', 'years', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing3 + lastType1 + years3 + smell3 + dust2 + family1 + efficiency2）
-        const MAX_PTS = 15;
+        // 汚れ点数の最大値（timing5 + lastType1 + years3 + smell3 + dust2 + family1 + efficiency2）
+        const MAX_PTS = 17;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -989,10 +989,10 @@
 
         const $ = (id) => document.getElementById(id);
 
-        // lastTypeはクリーニング経験者（1年以内・2年以内）のみ質問する
+        // lastTypeは直近4年以内にクリーニングした人のみ質問する（4年以上前・未経験は洗浄タイプを聞く意味が薄いため）
         function shouldAsk(key) {
             if (key === 'lastType') {
-                return answers.timing && (answers.timing.value === 'y1' || answers.timing.value === 'y2');
+                return answers.timing && (answers.timing.value === 'u2' || answers.timing.value === 'y24');
             }
             return true;
         }
@@ -1008,7 +1008,7 @@
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
             const t = answers.timing;
-            if (t && (t.value === 'y1' || t.value === 'y2')) return 7;
+            if (t && (t.value === 'u2' || t.value === 'y24')) return 7;
             return 6;
         }
 
@@ -1017,13 +1017,21 @@
             return Math.round((answers[key].pts / MAX_PTS) * 100);
         }
 
+        // 4年以上クリーニングしていない／一度もしたことがない人かどうか
+        function isLongNeglect() {
+            return answers.timing && (answers.timing.value === 'o4' || answers.timing.value === 'never');
+        }
+
         // お掃除おすすめ度 = 各項目の加算合計（5%〜95%の範囲で表示）
         function calcRecScore() {
             let total = 0;
             for (const key of ORDER) {
                 if (answers[key]) total += deductionOf(key);
             }
-            return Math.max(5, Math.min(95, total));
+            let score = Math.max(5, Math.min(95, total));
+            // 4年以上お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
+            if (isLongNeglect()) score = Math.max(score, 55);
+            return score;
         }
 
         // 汚れスコアに応じた状態フレーズ
@@ -1085,8 +1093,8 @@
             if (answers.smell && answers.smell.pts >= 2) reasons.push('ニオイがかなり気になる');
             else if (answers.smell && answers.smell.pts === 1) reasons.push('つけ始めのニオイが気になる');
             if (answers.timing) {
-                if (answers.timing.value === 'y3') reasons.push('3年以上クリーニングしていない');
-                if (answers.timing.value === 'never') reasons.push('クリーニングをしたことがない');
+                if (answers.timing.value === 'o4') reasons.push('4年以上クリーニングしていない');
+                if (answers.timing.value === 'never') reasons.push('クリーニングを一度もしたことがない');
             }
             if (answers.lastType && answers.lastType.value !== 'full') reasons.push('前回は奥まで洗わない通常分解だった');
             return reasons;
@@ -1197,7 +1205,11 @@
             let warnText = '';
             let warnIcon = '⚠️';
             let warnOk = false;
-            if (sympN >= 2) {
+            if (isLongNeglect() && sympN >= 1) {
+                warnText = '長期間クリーニングをしていないうえ、ニオイや汚れのサインも見られました。エアコン内部にカビやホコリがかなりたまっている可能性が高い状態です。';
+            } else if (isLongNeglect()) {
+                warnText = '目立った症状はまだ出ていませんが、4年以上クリーニングしていないエアコンの内部には、見えないカビやホコリが蓄積しているケースがほとんどです。';
+            } else if (sympN >= 2) {
                 warnText = 'ニオイや汚れのサインが複数見られました。エアコン内部に汚れがたまっている可能性が高そうです。';
             } else if (sympN === 1) {
                 warnText = '汚れのサインが見られました。内部に汚れがたまり始めているかもしれません。';
@@ -1231,7 +1243,7 @@
 
             // あなたの場合（おすすめ）
             const reasons = fullReasons();
-            const recommendFull = (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 60 || (answers.lastType && answers.lastType.value !== 'full' && score >= 30);
+            const recommendFull = isLongNeglect() || (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 60 || (answers.lastType && answers.lastType.value !== 'full' && score >= 30);
             const recReasons = $('recReasons');
             if (recommendFull) {
                 $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>も<br>検討をおすすめします！';

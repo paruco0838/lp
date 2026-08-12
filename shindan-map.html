@@ -216,6 +216,12 @@
             color: var(--red);
         }
 
+        .pts.p4,
+        .pts.p5 {
+            background: var(--red);
+            color: #fff;
+        }
+
         /* 分岐ブロック */
         .branch {
             display: grid;
@@ -397,6 +403,7 @@
                 <span><b class="pts p1">1点</b> 少し汚れ</span>
                 <span><b class="pts p2">2点</b> 汚れあり</span>
                 <span><b class="pts p3">3点</b> 汚れ大</span>
+                <span><b class="pts p5">4〜5点</b> 長期間の放置</span>
             </div>
         </header>
 
@@ -413,11 +420,12 @@
                 <span class="q-title">前回エアコンクリーニングをしたのはいつ頃ですか？</span>
             </div>
             <div class="choices">
-                <span class="choice">1年以内 <b class="pts p0">0点</b></span>
-                <span class="choice">2年以内 <b class="pts p1">1点</b></span>
-                <span class="choice">3年以上前 <b class="pts p2">2点</b></span>
-                <span class="choice">したことがない・覚えていない <b class="pts p3">3点</b></span>
+                <span class="choice">2年未満 <b class="pts p0">0点</b></span>
+                <span class="choice">2〜4年以内 <b class="pts p2">2点</b></span>
+                <span class="choice">4年以上 <b class="pts p4">4点</b></span>
+                <span class="choice">したことがない <b class="pts p5">5点</b></span>
             </div>
+            <p class="note">※「4年以上」「したことがない」は汚れが蓄積している前提で配点を高くし、さらにキレイ度の上限（最大45%）を設けてクリーニングを促します。</p>
         </div>
 
         <div class="connector short"></div>
@@ -425,12 +433,12 @@
         <!-- 分岐 -->
         <div class="branch">
             <div class="branch-arm yes">
-                <span class="arm-label">「1年以内」「2年以内」を選んだ人だけ</span>
+                <span class="arm-label">「2年未満」「2〜4年以内」を選んだ人だけ</span>
                 ↓ 質問2（洗浄タイプ）へ進む<br>
                 → 全 7問
             </div>
             <div class="branch-arm no">
-                <span class="arm-label">「3年以上前」「したことがない」を選んだ人</span>
+                <span class="arm-label">「4年以上」「したことがない」を選んだ人</span>
                 ↓ 質問2をスキップして質問3へ<br>
                 → 全 6問
             </div>
@@ -444,7 +452,7 @@
                 <span class="q-no">質問 2</span>
                 <span class="q-title">前回のクリーニングは、通常分解・完全分解のどちらでしたか？</span>
             </div>
-            <span class="q-cond">⚠️ クリーニング経験がある人だけに表示（唯一の分岐）</span>
+            <span class="q-cond">⚠️ 直近4年以内にクリーニングした人だけに表示（唯一の分岐）</span>
             <div class="choices">
                 <span class="choice">完全分解 <b class="pts p0">0点</b></span>
                 <span class="choice">通常分解 <b class="pts p1">1点</b></span>
@@ -463,8 +471,8 @@
             <div class="choices">
                 <span class="choice">1年未満 <b class="pts p0">0点</b></span>
                 <span class="choice">1〜3年 <b class="pts p1">1点</b></span>
-                <span class="choice">4〜7年 <b class="pts p2">2点</b></span>
-                <span class="choice">8年以上 <b class="pts p3">3点</b></span>
+                <span class="choice">4〜6年 <b class="pts p2">2点</b></span>
+                <span class="choice">7年以上 <b class="pts p3">3点</b></span>
             </div>
         </div>
 
@@ -540,15 +548,19 @@
 
         <div class="info-card">
             <div class="formula">
-                キレイ度 ＝ 100% − （選んだ点数の合計 ÷ 15点 × 100）
+                キレイ度 ＝ 100% − （選んだ点数の合計 ÷ 17点 × 100）
                 <span class="small">結果は 5%〜95% の範囲で表示されます</span>
             </div>
             <p class="note">
-                満点15点の内訳：前回のクリーニング（最大3点）＋洗浄タイプ（最大1点）＋使用年数（最大3点）＋ニオイ（最大3点）＋黒いカス（最大2点）＋お子様/ペット（最大1点）＋効き（最大2点）
+                満点17点の内訳：前回のクリーニング（最大5点）＋洗浄タイプ（最大1点）＋使用年数（最大3点）＋ニオイ（最大3点）＋黒いカス（最大2点）＋お子様/ペット（最大1点）＋効き（最大2点）
             </p>
             <p class="note">
-                例：3年以上前(2点) ＋ 4〜7年(2点) ＋ しばらくすると気になる(1点) ＋ 黒い点が見える(1点) ＋ どちらもいない(0点) ＋ 少し弱い(1点) ＝ 7点 → <b>キレイ度 53%</b>
+                例：2〜4年以内(2点) ＋ 通常分解(1点) ＋ 4〜6年(2点) ＋ しばらくすると気になる(1点) ＋ 黒い点が見える(1点) ＋ どちらもいない(0点) ＋ 少し弱い(1点) ＝ 8点 → <b>キレイ度 53%</b>
             </p>
+            <div class="formula" style="background:var(--red); font-size:14px;">
+                「4年以上」「したことがない」を選んだ場合<br>キレイ度は最大 45% までに制限
+                <span class="small">自覚症状がなくても、長期間放置したエアコン内部には汚れが蓄積しているため</span>
+            </div>
         </div>
 
         <!-- ===== 結果の見せ方 ===== -->
@@ -584,6 +596,7 @@
                 <p class="rb-cond">▼ 次のどれかに当てはまる場合</p>
                 <p class="rb-title">完全分解クリーニングも検討をおすすめします！</p>
                 <p class="rb-desc">
+                    ・<b>4年以上クリーニングしていない／したことがない</b>（必ず該当）<br>
                     ・黒い点／黒いカスが見える　・ニオイがすぐ臭う以上<br>
                     ・汚れの合計が高い　・前回が通常分解でそこそこ汚れている<br>
                     → 当てはまった項目が「おすすめの理由」として自動でリスト表示されます。
