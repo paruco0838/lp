@@ -275,6 +275,85 @@
             transition: width 1s ease;
         }
 
+        /* 点数の内訳 */
+        .breakdown {
+            background: var(--sky);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 18px;
+        }
+
+        .breakdown-title {
+            font-size: 13.5px;
+            font-weight: 900;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+
+        .bd-row {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .bd-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .bd-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bd-q {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .bd-a {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--ink);
+            flex: 1;
+        }
+
+        .bd-badge {
+            font-size: 12.5px;
+            font-weight: 900;
+            padding: 2px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .bd-badge.zero {
+            background: var(--mint);
+            color: var(--line-dark);
+        }
+
+        .bd-badge.small {
+            background: #fff3e5;
+            color: var(--orange);
+        }
+
+        .bd-badge.big {
+            background: #fdecea;
+            color: var(--red);
+        }
+
+        .bd-reason {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .bd-note {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
         .result-text {
             font-size: 14px;
             margin-top: 18px;
@@ -421,6 +500,7 @@
             <div class="gauge">
                 <div class="gauge-fill" id="gaugeFill"></div>
             </div>
+            <div class="breakdown" id="breakdown"></div>
             <div class="result-text" id="resultText"></div>
             <div class="pet-box hidden" id="petBox"></div>
             <div class="cta-area">
@@ -505,6 +585,17 @@
                     { label: '明らかに悪い', value: 'bad', pts: 2 },
                 ],
             },
+        };
+
+        // ===== 内訳表示用のラベルと理由 =====
+        const META = {
+            timing: { icon: '🕐', short: '前回のクリーニング', reasonBad: '前回のクリーニングから時間が経つほど、内部に汚れやカビが蓄積します' },
+            lastType: { icon: '🔧', short: '前回の洗浄タイプ', reasonBad: '通常分解では、奥やドレンパン部分に洗い残しが残りがちです' },
+            years: { icon: '📅', short: '使用年数', reasonBad: '使用年数が長いほど、ホコリやカビが溜まりやすくなります' },
+            smell: { icon: '👃', short: 'ニオイ', reasonBad: 'ニオイは内部でカビが繁殖しているサインです' },
+            dust: { icon: '💨', short: '黒いカス・汚れ', reasonBad: '黒い点やカスは、内部のカビ・汚れが表に出てきているサインです' },
+            family: { icon: '🐾', short: 'お子様・ペット', reasonBad: 'ペットの毛やホコリで、エアコン内部が汚れやすくなります' },
+            efficiency: { icon: '❄️', short: '効き・電気代', reasonBad: '効きの低下は、内部や室外機の汚れが原因のことがあります' },
         };
 
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
@@ -609,14 +700,42 @@
             return 6;
         }
 
-        // キレイ度 = 100 - 汚れ点数の割合（5%〜95%の範囲）
+        // 質問ごとの減点（%）。内訳表示と合計がピッタリ合うように、項目ごとに%へ換算する
+        function deductionOf(key) {
+            return Math.round((answers[key].pts / MAX_PTS) * 100);
+        }
+
+        // キレイ度 = 100 - 各項目の減点合計（5%〜95%の範囲で表示）
         function calcScore() {
-            let total = 0;
+            let ded = 0;
             for (const key of ORDER) {
-                if (answers[key]) total += answers[key].pts;
+                if (answers[key]) ded += deductionOf(key);
             }
-            const score = 100 - Math.round((total / MAX_PTS) * 100);
-            return Math.max(5, Math.min(95, score));
+            return Math.max(5, Math.min(95, 100 - ded));
+        }
+
+        // ===== 点数の内訳を描画 =====
+        function renderBreakdown() {
+            const box = $('breakdown');
+            let html = '<p class="breakdown-title">📝 この点数になった理由</p>';
+            for (const key of ORDER) {
+                if (!answers[key]) continue;
+                const a = answers[key];
+                const m = META[key];
+                const ded = deductionOf(key);
+                const badgeClass = ded === 0 ? 'zero' : ded >= 10 ? 'big' : 'small';
+                const badgeText = ded === 0 ? '減点なし' : `−${ded}%`;
+                html += `<div class="bd-row">
+                    <div class="bd-main">
+                        <span class="bd-q">${m.icon} ${m.short}</span>
+                        <span class="bd-a">${a.label}</span>
+                        <span class="bd-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    ${ded > 0 ? `<p class="bd-reason">${m.reasonBad}</p>` : ''}
+                </div>`;
+            }
+            html += '<p class="bd-note">※100%から各項目の減点を引いた数字がキレイ度です（表示は5%〜95%の範囲）</p>';
+            box.innerHTML = html;
         }
 
         function showQuestion(key) {
@@ -643,7 +762,7 @@
                 btn.className = 'choice-btn';
                 btn.textContent = c.label;
                 btn.addEventListener('click', () => {
-                    answers[key] = { value: c.value, pts: c.pts };
+                    answers[key] = { value: c.value, pts: c.pts, label: c.label };
                     history.push(key);
                     advance();
                 });
@@ -695,6 +814,8 @@
             setTimeout(() => {
                 $('gaugeFill').style.width = `${score}%`;
             }, 100);
+
+            renderBreakdown();
 
             const texts = baseTexts(score).concat(symptomTexts());
             $('resultText').innerHTML = texts.map((t) => `<p>${t}</p>`).join('');
