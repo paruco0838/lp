@@ -745,7 +745,7 @@
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は最大7問・約1分で完了</li>
+                <li>質問は最大8問・約1分で完了</li>
                 <li>診断結果に合わせたおすすめのお手入れ方法をご紹介</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
@@ -901,6 +901,16 @@
                     { label: '7年以上', value: 'o7', pts: 3 },
                 ],
             },
+            frequency: {
+                title: 'エアコンを使用する頻度はどれくらいですか？',
+                note: '',
+                choices: [
+                    { label: 'あまり使わない', value: 'rare', pts: 0 },
+                    { label: '夏のみ・冬のみ使用する', value: 'season', pts: 1 },
+                    { label: '夏と冬に使用する', value: 'both', pts: 2 },
+                    { label: '一年中使用する', value: 'all', pts: 3 },
+                ],
+            },
             smell: {
                 title: 'エアコンをつけたときのニオイはいかがですか？',
                 note: '',
@@ -932,7 +942,7 @@
                 ],
             },
             efficiency: {
-                title: 'エアコンの効き方や電気代について、変化はありますか？',
+                title: 'エアコンの効き方について、変化はありますか？',
                 note: '',
                 choices: [
                     { label: '変わらない', value: 'same', pts: 0 },
@@ -958,6 +968,11 @@
                 y46: { title: '使用年数が4〜6年', desc: 'ホコリやカビがたまりやすくなる時期です。' },
                 o7: { title: '使用年数が7年以上', desc: '長年の使用で内部の汚れが蓄積しやすい状態です。' },
             },
+            frequency: {
+                season: { title: '夏のみ・冬のみ使用している', desc: '稼働期間が長い分、内部にホコリがたまりやすくなります。' },
+                both: { title: '夏と冬に使用している', desc: '稼働期間が長い分、内部にホコリやカビがたまりやすくなります。' },
+                all: { title: '一年中使用している', desc: '稼働時間が長く、内部にホコリやカビがたまりやすい状態です。' },
+            },
             smell: {
                 later: { title: 'つけ始めのニオイが気になる', desc: '内部でカビが発生し始めているサインかもしれません。' },
                 soon: { title: 'ニオイがかなり気になる', desc: '内部の汚れが原因でニオイが発生している可能性があります。' },
@@ -978,10 +993,10 @@
         };
 
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
-        const ORDER = ['timing', 'lastType', 'years', 'smell', 'dust', 'family', 'efficiency'];
+        const ORDER = ['timing', 'lastType', 'years', 'frequency', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing5 + lastType1 + years3 + smell3 + dust2 + family1 + efficiency2）
-        const MAX_PTS = 17;
+        // 汚れ点数の最大値（timing5 + lastType1 + years3 + frequency3 + smell3 + dust2 + family1 + efficiency2）
+        const MAX_PTS = 20;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1008,8 +1023,8 @@
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
             const t = answers.timing;
-            if (t && (t.value === 'u2' || t.value === 'y24')) return 7;
-            return 6;
+            if (t && (t.value === 'u2' || t.value === 'y24')) return 8;
+            return 7;
         }
 
         // 質問ごとのおすすめ度への加算（%）
