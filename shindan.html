@@ -1040,17 +1040,18 @@
             return `hsl(${hue}, 78%, 44%)`;
         }
 
-        // キレイ度に応じたリングのグラデーション（0%=赤 → キレイ度に応じて緑・黄 → 高いほど青に近づく）
+        // キレイ度に応じたリングのグラデーション（低い=赤、高いほど青に近づく単色。同じ色相内で濃淡をつけた光沢表現）
         function buildRingGradient(cleanScore) {
-            const steps = 8;
-            const stops = [];
-            for (let i = 0; i <= steps; i++) {
-                const pct = (cleanScore * i) / steps;
-                const hue = Math.round(pct * 2.1);
-                stops.push(`hsl(${hue}, 80%, 50%) ${pct.toFixed(1)}%`);
-            }
-            stops.push(`var(--border) ${cleanScore.toFixed(1)}%`);
-            stops.push(`var(--border) 100%`);
+            const hue = Math.round(cleanScore * 2.1);
+            const mid = (cleanScore / 2).toFixed(1);
+            const end = cleanScore.toFixed(1);
+            const stops = [
+                `hsl(${hue}, 78%, 40%) 0%`,
+                `hsl(${hue}, 78%, 58%) ${mid}%`,
+                `hsl(${hue}, 78%, 40%) ${end}%`,
+                `var(--border) ${end}%`,
+                `var(--border) 100%`,
+            ];
             return `conic-gradient(from 0deg, ${stops.join(', ')})`;
         }
 
