@@ -395,7 +395,7 @@
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部のキレイ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は最大8問・約1分で完了</li>
+                <li>質問は最大7問・約1分で完了</li>
                 <li>キレイ度に合わせた状態の解説・アドバイス付き</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
@@ -481,26 +481,19 @@
                 title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
                 note: '',
                 choices: [
-                    { label: '見えない', value: 'none', pts: 0 },
+                    { label: '見たことがない', value: 'none', pts: 0 },
                     { label: '黒い点が見える', value: 'spots', pts: 1 },
                     { label: '黒いカスが出ることがある', value: 'debris', pts: 2 },
-                    { label: '頻繁に降ってくる', value: 'often', pts: 3 },
                 ],
             },
-            child: {
-                title: 'ご家庭に小さなお子様はいらっしゃいますか？',
+            family: {
+                title: 'ご家庭に小さなお子様やペットはいらっしゃいますか？',
                 note: '',
                 choices: [
-                    { label: 'いない', value: 'no', pts: 0 },
-                    { label: 'いる', value: 'yes', pts: 0 },
-                ],
-            },
-            pet: {
-                title: 'ペットは飼われていますか？',
-                note: '',
-                choices: [
-                    { label: '飼っていない', value: 'no', pts: 0 },
-                    { label: '飼っている', value: 'yes', pts: 1 },
+                    { label: '子供のみいる', value: 'child', pts: 0 },
+                    { label: 'ペットのみ飼っている', value: 'pet', pts: 1 },
+                    { label: '両方いる', value: 'both', pts: 1 },
+                    { label: 'どちらもいない', value: 'none', pts: 0 },
                 ],
             },
             efficiency: {
@@ -515,10 +508,10 @@
         };
 
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
-        const ORDER = ['timing', 'lastType', 'years', 'smell', 'dust', 'child', 'pet', 'efficiency'];
+        const ORDER = ['timing', 'lastType', 'years', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing3 + lastType1 + years3 + smell3 + dust3 + child0 + pet1 + efficiency2）
-        const MAX_PTS = 16;
+        // 汚れ点数の最大値（timing3 + lastType1 + years3 + smell3 + dust2 + family1 + efficiency2）
+        const MAX_PTS = 15;
 
         // ===== スコア帯ごとの基本コメント =====
         function baseTexts(score) {
@@ -572,8 +565,9 @@
 
         // ===== お子様・ペットの声かけコメント =====
         function familyText() {
-            const hasChild = answers.child && answers.child.value === 'yes';
-            const hasPet = answers.pet && answers.pet.value === 'yes';
+            const fam = answers.family ? answers.family.value : 'none';
+            const hasChild = fam === 'child' || fam === 'both';
+            const hasPet = fam === 'pet' || fam === 'both';
             if (hasChild && hasPet) {
                 return '🧒🐾 お子様やペットは長時間エアコンの空気を吸い続けるため、健康への影響が心配です。ご家族とペットのために、定期的なクリーニングをおすすめします。';
             }
@@ -611,8 +605,8 @@
         // 全体の質問数（分岐で変わる）
         function totalQuestions() {
             const t = answers.timing;
-            if (t && (t.value === 'y1' || t.value === 'y2')) return 8;
-            return 7;
+            if (t && (t.value === 'y1' || t.value === 'y2')) return 7;
+            return 6;
         }
 
         // キレイ度 = 100 - 汚れ点数の割合（5%〜95%の範囲）
