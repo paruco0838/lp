@@ -739,6 +739,25 @@
             color: var(--navy);
         }
 
+        .btn-red {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue), #1f78b8);
+            color: #fff;
+            font-size: 16.5px;
+            font-weight: 900;
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 16px 12px;
+            box-shadow: 0 6px 16px rgba(45, 143, 213, .4);
+            transition: opacity .15s;
+            margin-top: 14px;
+        }
+
+        .btn-red:hover {
+            opacity: .88;
+        }
+
         .cta-sub {
             font-size: 11.5px;
             color: var(--muted);
@@ -772,8 +791,9 @@
         }
 
         .cta-line {
-            margin-top: 14px;
+            margin-top: 10px;
             border-radius: 999px;
+            font-size: 15px;
         }
 
         .restart-btn {
@@ -1004,7 +1024,8 @@
 
             <!-- CTA -->
             <div class="card cta-card">
-                <p class="cta-title">洗濯槽の状態が気になったら、お気軽にご相談ください！</p>
+                <p class="cta-title">この診断結果をもとに、料金を確認してみましょう！</p>
+                <a class="btn-red" id="mitumoriBtn" href="sentaku-mitumori.html">かんたん見積もりで料金を見る ›</a>
                 <a class="btn-line cta-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">LINEで相談・予約する</a>
                 <p class="cta-sub">🔒 無理な営業は一切いたしませんので、ご安心ください。</p>
                 <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
@@ -1015,6 +1036,9 @@
     </div>
 
     <script>
+        // 見積もりアプリのURL（同じ場所に置く場合はこのままでOK）
+        const MITUMORI_URL = 'sentaku-mitumori.html';
+
         // ===== 質問の定義（各選択肢に汚れ点数 pts を持つ加点方式） =====
         const QUESTIONS = {
             type: {
@@ -1491,6 +1515,13 @@
             // 料金の目安をタイプに合わせて表示
             updatePriceBox();
 
+            // 見積もりアプリへ診断結果を引き継ぐ（キレイ度とおすすめ内容）
+            const recKey = recommendFull ? 'full' : (score >= 20 ? 'soon' : 'none');
+            $('mitumoriBtn').href = `${MITUMORI_URL}?clean=${cleanScore}&rec=${recKey}`;
+
+            // 見積もりページから戻ってきたときに、この結果をそのまま復元できるようにしておく
+            saveAnswers();
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1514,9 +1545,49 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        /* ===== 見積もりページから戻ってきたときの結果の復元 =====
+         * 見積もりページの「診断結果に戻る」から ?restore=1 付きで開かれた場合に、
+         * 直前の診断結果をそのまま復元する（もう一度答え直さなくて済むように）。
+         * 保存先は sessionStorage なので、タブを閉じれば自動的に消える。
+         */
+        const SAVE_KEY = 'kajiraku_sentaku_answers';
+
+        function saveAnswers() {
+            try {
+                sessionStorage.setItem(SAVE_KEY, JSON.stringify(answers));
+            } catch (e) {
+                // プライベートモードなどで保存できない場合は、復元をあきらめるだけ
+            }
+        }
+
+        function restoreIfRequested() {
+            if (new URLSearchParams(window.location.search).get('restore') !== '1') return false;
+            let saved;
+            try {
+                saved = JSON.parse(sessionStorage.getItem(SAVE_KEY) || 'null');
+            } catch (e) {
+                return false;
+            }
+            if (!saved) return false;
+
+            // 全問そろっている場合だけ復元する（shouldAsk は answers を見て分岐を判断するので先に入れる）
+            answers = saved;
+            if (!ORDER.every((k) => !shouldAsk(k) || answers[k])) {
+                answers = {};
+                return false;
+            }
+
+            $('startCard').classList.add('hidden');
+            $('progressArea').style.display = 'block';
+            showResult();
+            return true;
+        }
+
         $('startBtn').addEventListener('click', advance);
         $('backBtn').addEventListener('click', goBack);
         $('restartBtn').addEventListener('click', restart);
+
+        restoreIfRequested();
     </script>
 </body>
 

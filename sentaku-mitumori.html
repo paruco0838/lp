@@ -484,6 +484,79 @@
             display: none !important;
         }
 
+        /* ── 診断結果の引き継ぎ表示 ───────────────── */
+        .shindan-banner {
+            background: var(--teal-pale);
+            border: 1px solid var(--teal);
+        }
+
+        .sb-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .sb-badge {
+            background: var(--teal);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: .08em;
+        }
+
+        .sb-score {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--teal-deep);
+        }
+
+        .sb-score strong {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+
+        .sb-text {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--ink);
+        }
+
+        /* 見積もり結果から診断結果へ戻るリンク */
+        .back-shindan {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .back-shindan a {
+            color: var(--muted);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1px;
+        }
+
+        /* 診断ページへの誘導 */
+        .shindan-link {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-top: 2px;
+        }
+
+        .shindan-link a {
+            color: var(--teal-dark);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid var(--teal);
+        }
+
         .disclaimer {
             font-size: 11.5px;
             color: var(--muted);
@@ -509,11 +582,26 @@
 
         <!-- ── ステップ1：メニュー ───────────────── -->
         <section id="screen-1">
+            <!-- 診断ページから来た場合だけ表示される -->
+            <div class="card shindan-banner hidden" id="shindan-banner">
+                <div class="sb-head">
+                    <span class="sb-badge">診断結果</span>
+                    <span class="sb-score">キレイ度 <strong id="sb-score">-</strong>%</span>
+                </div>
+                <p class="sb-text" id="sb-text"></p>
+            </div>
+
             <div class="card">
                 <h2 class="sec-title">クリーニングする洗濯機を選ぶ</h2>
                 <p class="sec-note">台数を「＋」で増やしてください。複数タイプの組み合わせもOKです。</p>
                 <div id="menu-list"></div>
             </div>
+
+            <!-- 診断ページから来た場合は非表示にする -->
+            <p class="shindan-link" id="shindan-link-wrap">
+                クリーニングが必要かどうか迷ったら<br>
+                <a href="#" id="shindan-link">▶ 洗濯機キレイ度診断でチェックする</a>
+            </p>
         </section>
 
         <!-- ── ステップ2：オプション ───────────────── -->
@@ -543,6 +631,10 @@
                 <div class="btn-row">
                     <button class="btn btn-ghost" id="btn-restart">やり直す</button>
                 </div>
+                <!-- 診断ページから来た場合だけ表示する -->
+                <p class="back-shindan hidden" id="back-shindan-wrap">
+                    <a href="#" id="btn-back-shindan">← 診断結果に戻る</a>
+                </p>
             </div>
 
             <p class="disclaimer">
@@ -564,6 +656,10 @@
                 <button class="btn btn-ghost hidden" id="btn-back" style="flex:0 0 90px">戻る</button>
                 <button class="btn btn-primary" id="btn-next" disabled>オプションを選ぶ</button>
             </div>
+            <!-- 診断ページから来た場合だけ表示する -->
+            <p class="back-shindan hidden" id="bar-back-shindan-wrap" style="margin-top:8px">
+                <a href="#" id="bar-btn-back-shindan">← 診断結果に戻る</a>
+            </p>
         </div>
     </div>
 
@@ -576,6 +672,9 @@
          * hours … 作業時間の目安 [最短, 最長]（時間）※現在は画面に表示していません
          * =================================================================== */
         var PRICING = {
+            // キレイ度診断ページのURL（同じ場所に置く場合はこのままでOK）
+            shindanUrl: 'sentaku-shindan.html',
+
             // 乾燥機能付き縦型の追加料金（1台につき）
             dryExtra: 2000,
 
@@ -602,11 +701,73 @@
         var state = {
             step: 1,
             menuQty: {},   // { メニューid: 台数 }
-            optionQty: {}  // { オプションid: 個数 }
+            optionQty: {}, // { オプションid: 個数 }
+            shindan: null  // 診断ページから引き継いだ結果
         };
 
         var $ = function (id) { return document.getElementById(id); };
         var yen = function (n) { return n.toLocaleString('ja-JP'); };
+
+        /* ── 診断ページからの引き継ぎ ─────────────────
+         * 診断ページから ?clean=47&rec=full の形で結果を受け取る。
+         *   clean … キレイ度（％）
+         *   rec   … full  = 洗濯槽の分解クリーニングがおすすめ
+         *           soon  = そろそろクリーニングがおすすめ
+         *           none  = 今すぐは必須ではない
+         * 診断を通らず直接開いた場合は、何も表示しない。
+         * ───────────────────────────────────────── */
+        var SHINDAN_MESSAGES = {
+            full: {
+                text: '診断の結果、洗濯槽の「分解クリーニング」がおすすめです。市販のクリーナーでは落としきれない、槽の裏側のカビや石けんカスまで取り除けます。'
+            },
+            soon: {
+                text: 'そろそろ分解クリーニングの検討時期です。黒いカスやニオイが出る前のお掃除が、費用も手間も一番おトクです。'
+            },
+            none: {
+                text: '今すぐのクリーニングは必須ではなさそうです。月1回の洗濯槽クリーナーと、2〜3年に1度を目安にした分解クリーニングがおすすめです。'
+            }
+        };
+
+        function readShindanResult() {
+            var params = new URLSearchParams(window.location.search);
+            var rec = params.get('rec');
+            var clean = parseInt(params.get('clean'), 10);
+
+            if (!SHINDAN_MESSAGES[rec]) return null;
+
+            return {
+                rec: rec,
+                clean: (isNaN(clean) || clean < 0 || clean > 100) ? null : clean,
+                message: SHINDAN_MESSAGES[rec].text
+            };
+        }
+
+        function setupShindan() {
+            $('shindan-link').href = PRICING.shindanUrl;
+            state.shindan = readShindanResult();
+            if (!state.shindan) return;
+
+            // 診断から来た人には、診断への誘導リンクは出さず、かわりに戻るリンクを出す
+            $('shindan-link-wrap').classList.add('hidden');
+            $('back-shindan-wrap').classList.remove('hidden');
+            // restore=1 を付けると、診断ページが直前の結果をそのまま出し直してくれる
+            // （ブラウザの「戻る」だと、端末によっては最初からやり直しになってしまうため）
+            $('btn-back-shindan').href = PRICING.shindanUrl + '?restore=1';
+            // 下部固定バーにも同じ戻るリンクを出す（どのステップからでも診断結果へ戻れるように）
+            $('bar-back-shindan-wrap').classList.remove('hidden');
+            $('bar-btn-back-shindan').href = PRICING.shindanUrl + '?restore=1';
+
+            var banner = $('shindan-banner');
+            banner.classList.remove('hidden');
+            $('sb-text').textContent = state.shindan.message;
+
+            if (state.shindan.clean === null) {
+                // キレイ度が渡ってこなかった場合は数値部分を隠す
+                $('sb-score').parentNode.style.display = 'none';
+            } else {
+                $('sb-score').textContent = state.shindan.clean;
+            }
+        }
 
         /* ── 集計 ───────────────── */
 
@@ -996,6 +1157,7 @@
             goStep(1);
         });
 
+        setupShindan();
         renderMenus();
         updateBar();
     </script>
