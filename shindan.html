@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キレイ度診断 | カジラク</title>
-    <meta name="description" content="質問に答えるだけで、あなたの家のエアコン・洗濯機の「お掃除おすすめ度」をチェック！状態に合わせたおすすめのお手入れ方法もご紹介する無料診断です。">
+    <title>エアコンキレイ度診断 | カジラク</title>
+    <meta name="description" content="質問に答えるだけで、あなたの家のエアコンの「お掃除おすすめ度」をチェック！状態に合わせたおすすめのお手入れ方法もご紹介する無料診断です。">
     <style>
         :root {
             --navy: #102840;
@@ -785,66 +785,6 @@
             margin-top: 20px;
         }
 
-        /* 診断の種類選択（エアコン／洗濯機） */
-        .cat-list {
-            display: grid;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .cat-btn {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 100%;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            font-size: 17px;
-            font-weight: 900;
-            color: var(--navy);
-            cursor: pointer;
-            text-decoration: none;
-            font-family: inherit;
-            text-align: left;
-            transition: border-color .15s, background .15s, transform .1s;
-        }
-
-        /* マウス操作のときだけ色を変える（スマホはタップ後も色が残ってしまうため） */
-        @media (hover: hover) {
-            .cat-btn:hover {
-                border-color: var(--blue);
-                background: var(--sky);
-            }
-        }
-
-        .cat-btn:active {
-            transform: scale(.98);
-        }
-
-        .cat-icon {
-            font-size: 30px;
-        }
-
-        .cat-label {
-            flex: 1;
-            line-height: 1.4;
-        }
-
-        .cat-sub {
-            display: block;
-            font-size: 12px;
-            color: var(--muted);
-            font-weight: 700;
-        }
-
-        .cat-arrow {
-            color: var(--blue);
-            font-size: 22px;
-            font-weight: 900;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -871,8 +811,8 @@
     <div class="wrap">
         <header class="site-header">
             <span class="area-badge">📍 大阪・兵庫エリア対応 / 出張費無料</span>
-            <h1 id="pageTitle">キレイ度診断</h1>
-            <p class="lead">カジラク | ハウスクリーニング</p>
+            <h1>エアコンキレイ度診断</h1>
+            <p class="lead">カジラク | エアコンクリーニング</p>
         </header>
 
         <!-- プログレス -->
@@ -883,26 +823,8 @@
             </div>
         </div>
 
-        <!-- 診断の種類を選ぶ画面 -->
-        <div class="card" id="categoryCard">
-            <p class="start-title">どちらのキレイ度を<br>診断しますか？</p>
-            <p class="start-text" style="text-align:center;">気になるほうを選んでスタート！<br>どちらも約1分・個人情報の入力は不要です。</p>
-            <div class="cat-list">
-                <button class="cat-btn" id="catAirconBtn" type="button">
-                    <span class="cat-icon">❄️</span>
-                    <span class="cat-label">エアコン<span class="cat-sub">内部のカビ・ホコリをチェック</span></span>
-                    <span class="cat-arrow">›</span>
-                </button>
-                <a class="cat-btn" href="sentaku-shindan.html">
-                    <span class="cat-icon">🧺</span>
-                    <span class="cat-label">洗濯機<span class="cat-sub">洗濯槽のカビ・黒いカスをチェック</span></span>
-                    <span class="cat-arrow">›</span>
-                </a>
-            </div>
-        </div>
-
         <!-- スタート画面 -->
-        <div class="card hidden" id="startCard">
+        <div class="card" id="startCard">
             <svg class="start-illust" viewBox="0 0 200 140" role="img" aria-labelledby="illustTitle">
                 <title id="illustTitle">きれいな風を送り出すエアコンのイラスト</title>
 
@@ -953,7 +875,6 @@
             <div class="cta-area">
                 <button class="btn-line" id="startBtn" type="button">早速診断スタート 👇</button>
             </div>
-            <button class="back-link" id="toCategoryBtn" type="button">← 診断の選択に戻る</button>
         </div>
 
         <!-- 質問カード -->
@@ -1605,28 +1526,10 @@
             }
 
             $('startCard').classList.add('hidden');
-            $('categoryCard').classList.add('hidden');
-            $('pageTitle').textContent = 'エアコンキレイ度診断';
             $('progressArea').style.display = 'block';
             showResult();
             return true;
         }
-
-        /* ===== 診断の種類選択（エアコン／洗濯機） =====
-         * エアコンを選ぶとこのページの診断がそのまま始まる。
-         * 洗濯機は sentaku-shindan.html へ移動する（ボタン自体がリンク）。
-         */
-        $('catAirconBtn').addEventListener('click', () => {
-            $('categoryCard').classList.add('hidden');
-            $('startCard').classList.remove('hidden');
-            $('pageTitle').textContent = 'エアコンキレイ度診断';
-        });
-
-        $('toCategoryBtn').addEventListener('click', () => {
-            $('startCard').classList.add('hidden');
-            $('categoryCard').classList.remove('hidden');
-            $('pageTitle').textContent = 'キレイ度診断';
-        });
 
         $('startBtn').addEventListener('click', advance);
         $('backBtn').addEventListener('click', goBack);
