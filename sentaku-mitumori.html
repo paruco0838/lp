@@ -587,6 +587,8 @@
             ],
 
             options: [
+                // drumOnly … ドラム式だけに付けられるオプション（ドラム式の台数分まで）
+                { id: 'full_drum', name: '完全分解クリーニング', price: 23000, drumOnly: true, desc: 'ほぼ全てのパーツを分解し、奥のカビまで徹底的に洗浄します（ドラム式のみ）' },
                 { id: 'mold', name: '防カビ抗菌コーティング', price: 3000, desc: 'クリーニングの効果を長持ちさせます' },
                 // tateOnly … 縦型だけに付けられるオプション（縦型の台数分まで）
                 { id: 'pan', name: '洗濯パン・排水口清掃', price: 3000, tateOnly: true, desc: '洗濯機まわりの汚れ・ニオイ対策に（縦型のみ）' }
@@ -630,9 +632,21 @@
             return n;
         }
 
+        // ドラム式で選んだ台数（ドラム式のみのオプションの上限に使う）
+        function drumUnits() {
+            var n = 0;
+            PRICING.menus.forEach(function (m) {
+                if (m.dry) return;
+                n += (state.menuQty[m.id] || 0) + (state.menuQty[dryKey(m.id)] || 0);
+            });
+            return n;
+        }
+
         // そのオプションを付けられる上限台数
         function optionCap(o) {
-            return o.tateOnly ? tateUnits() : totalUnits();
+            if (o.tateOnly) return tateUnits();
+            if (o.drumOnly) return drumUnits();
+            return totalUnits();
         }
 
         // 金額を計算して内訳つきで返す
