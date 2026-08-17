@@ -120,6 +120,74 @@
             text-align: center;
         }
 
+        /* スタート画面のエアコンイラスト */
+        .start-illust {
+            display: block;
+            width: 190px;
+            max-width: 78%;
+            height: auto;
+            margin: 2px auto 6px;
+        }
+
+        /* 吹き出す風を、奥から手前へ流れるように動かす */
+        .ac-wind {
+            animation: acWind 2.6s ease-in-out infinite;
+        }
+
+        .ac-wind-2 {
+            animation-delay: .5s;
+        }
+
+        .ac-wind-3 {
+            animation-delay: 1s;
+        }
+
+        @keyframes acWind {
+
+            0%,
+            100% {
+                opacity: .25;
+                transform: translate(0, 0);
+            }
+
+            45% {
+                opacity: 1;
+                transform: translate(3px, 5px);
+            }
+        }
+
+        .ac-sparkle {
+            animation: acSparkle 2.4s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .ac-sparkle-2 {
+            animation-delay: 1.2s;
+        }
+
+        @keyframes acSparkle {
+
+            0%,
+            100% {
+                opacity: .35;
+                transform: scale(.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+        }
+
+        /* 動きを減らす設定の方には静止して見せる */
+        @media (prefers-reduced-motion: reduce) {
+
+            .ac-wind,
+            .ac-sparkle {
+                animation: none;
+            }
+        }
+
         .start-title {
             font-size: 19px;
             font-weight: 900;
@@ -643,6 +711,13 @@
             opacity: .88;
         }
 
+        /* CTA内のLINEボタン（見積もりボタンの下に置く2番目のボタン） */
+        .cta-line {
+            margin-top: 10px;
+            border-radius: 999px;
+            font-size: 15px;
+        }
+
         .cta-sub {
             font-size: 11.5px;
             color: var(--muted);
@@ -741,7 +816,46 @@
 
         <!-- スタート画面 -->
         <div class="card" id="startCard">
-            <div class="start-emoji">🍃</div>
+            <svg class="start-illust" viewBox="0 0 200 140" role="img" aria-labelledby="illustTitle">
+                <title id="illustTitle">きれいな風を送り出すエアコンのイラスト</title>
+
+                <!-- 床にうっすら落ちる影 -->
+                <ellipse cx="100" cy="128" rx="58" ry="7" fill="var(--sky)" />
+
+                <!-- 本体 -->
+                <rect x="24" y="24" width="152" height="46" rx="12" fill="#fff" stroke="var(--navy)"
+                    stroke-width="3.5" />
+                <!-- 前面パネルの合わせ目 -->
+                <path d="M27 45 H173" stroke="var(--navy)" stroke-width="2" opacity=".2" stroke-linecap="round" />
+                <!-- 吹き出し口 -->
+                <rect x="38" y="53" width="124" height="11" rx="5.5" fill="var(--sky)" stroke="var(--navy)"
+                    stroke-width="2.5" />
+                <!-- 運転ランプ -->
+                <circle cx="158" cy="36" r="3.5" fill="var(--blue)" />
+
+                <!-- 吹き出す風 -->
+                <g fill="none" stroke="var(--blue)" stroke-width="4.5" stroke-linecap="round">
+                    <path class="ac-wind" d="M66 82 q16 15 34 8" />
+                    <path class="ac-wind ac-wind-2" d="M54 99 q19 17 40 9" />
+                    <path class="ac-wind ac-wind-3" d="M74 114 q16 13 34 6" />
+                </g>
+
+                <!-- キラッと光るきれいさの表現
+                     （位置は g で指定し、拡大縮小だけを path 側で動かす） -->
+                <g fill="var(--orange)">
+                    <g transform="translate(150 92)">
+                        <path class="ac-sparkle" d="M0 -8 Q1.4 -1.4 8 0 Q1.4 1.4 0 8 Q-1.4 1.4 -8 0 Q-1.4 -1.4 0 -8 Z" />
+                    </g>
+                    <g transform="translate(170 110)">
+                        <path class="ac-sparkle ac-sparkle-2"
+                            d="M0 -5 Q.9 -.9 5 0 Q.9 .9 0 5 Q-.9 .9 -5 0 Q-.9 -.9 0 -5 Z" />
+                    </g>
+                    <g transform="translate(38 88)">
+                        <path class="ac-sparkle ac-sparkle-2"
+                            d="M0 -5.5 Q1 -1 5.5 0 Q1 1 0 5.5 Q-1 1 -5.5 0 Q-1 -1 0 -5.5 Z" />
+                    </g>
+                </g>
+            </svg>
             <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
             <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
             <ul class="start-points">
@@ -816,7 +930,7 @@
                     <div class="vs-card">
                         <span class="vs-tag">通常クリーニング</span>
                         <ul>
-                            <li>外装パーツなどを外して洗浄</li>
+                            <li>送風ファンやドレンパンを外さずに洗浄</li>
                             <li>一般的な汚れに対応</li>
                             <li>比較的短時間で完了</li>
                         </ul>
@@ -825,7 +939,7 @@
                     <div class="vs-card full">
                         <span class="vs-tag">完全分解クリーニング</span>
                         <ul>
-                            <li>より多くの内部パーツを取り外す</li>
+                            <li>送風ファンやドレンパンも外して洗浄</li>
                             <li>通常では洗いにくい場所まで洗浄</li>
                             <li>ニオイや奥の汚れに効果的</li>
                         </ul>
@@ -860,7 +974,8 @@
             <!-- CTA -->
             <div class="card cta-card">
                 <p class="cta-title">この診断結果をもとに、料金を確認してみましょう！</p>
-                <a class="btn-red" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">おすすめ施工の料金を見る ›</a>
+                <a class="btn-red" id="mitumoriBtn" href="mitumori.html">かんたん見積もりで料金を見る ›</a>
+                <a class="btn-line cta-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">LINEで相談・予約する</a>
                 <p class="cta-sub">🔒 無理な営業は一切いたしませんので、ご安心ください。</p>
                 <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
             </div>
@@ -870,6 +985,9 @@
     </div>
 
     <script>
+        // 見積もりアプリのURL（同じ場所に置く場合はこのままでOK）
+        const MITUMORI_URL = 'mitumori.html';
+
         // ===== 質問の定義（各選択肢に汚れ点数 pts を持つ加点方式） =====
         const QUESTIONS = {
             timing: {
@@ -877,8 +995,8 @@
                 note: '※プロ業者によるクリーニングのみ。セルフクリーニングは除きます',
                 choices: [
                     { label: '2年未満', value: 'u2', pts: 0 },
-                    { label: '2〜4年以内', value: 'y24', pts: 2 },
-                    { label: '4年以上', value: 'o4', pts: 4 },
+                    { label: '2〜4年以内', value: 'y24', pts: 3 },
+                    { label: '4年以上', value: 'o4', pts: 5 },
                     { label: 'したことがない', value: 'never', pts: 5 },
                 ],
             },
@@ -887,8 +1005,8 @@
                 note: '※ほとんどの方が通常分解の洗浄です。完全分解はごく少数の方が選んでいます',
                 choices: [
                     { label: '完全分解', value: 'full', pts: 0 },
-                    { label: '通常分解', value: 'normal', pts: 1 },
-                    { label: 'わからない', value: 'unknown', pts: 1 },
+                    { label: '通常分解', value: 'normal', pts: 2 },
+                    { label: 'わからない', value: 'unknown', pts: 2 },
                 ],
             },
             years: {
@@ -896,8 +1014,8 @@
                 note: '',
                 choices: [
                     { label: '1年未満', value: 'u1', pts: 0 },
-                    { label: '1〜3年', value: 'y13', pts: 1 },
-                    { label: '4〜6年', value: 'y46', pts: 3 },
+                    { label: '1〜3年', value: 'y13', pts: 2 },
+                    { label: '4〜6年', value: 'y46', pts: 4 },
                     { label: '7年以上', value: 'o7', pts: 5 },
                 ],
             },
@@ -905,10 +1023,11 @@
                 title: 'エアコンを使用する頻度はどれくらいですか？',
                 note: '',
                 choices: [
-                    { label: 'あまり使わない', value: 'rare', pts: 0 },
-                    { label: '夏のみ・冬のみ使用する', value: 'season', pts: 1 },
-                    { label: '夏と冬に使用する', value: 'both', pts: 2 },
-                    { label: '一年中使用する', value: 'all', pts: 5 },
+                    // 冷房は結露でカビが発生しやすいため、夏のみは冬のみより高い配点にしている
+                    { label: '夏のみ使用する', value: 'summer', pts: 3 },
+                    { label: '冬のみ使用する', value: 'winter', pts: 1 },
+                    { label: '夏と冬に使用する', value: 'both', pts: 4 },
+                    { label: 'ほぼ1年中使用する', value: 'all', pts: 5 },
                 ],
             },
             smell: {
@@ -916,19 +1035,19 @@
                 note: '',
                 choices: [
                     { label: '気にならない', value: 'none', pts: 0 },
-                    { label: 'しばらくすると気になる', value: 'later', pts: 1 },
-                    { label: 'すぐ臭う', value: 'soon', pts: 2 },
-                    { label: '常に臭う', value: 'always', pts: 3 },
+                    { label: 'しばらくすると気になる', value: 'later', pts: 3 },
+                    { label: 'すぐ臭う', value: 'soon', pts: 4 },
+                    { label: '常に臭う', value: 'always', pts: 5 },
                 ],
             },
             dust: {
                 title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
                 note: '',
                 choices: [
-                    { label: '見たことがない', value: 'never_checked', pts: 1 },
+                    { label: '見たことがない', value: 'never_checked', pts: 2 },
                     { label: '黒い点は見えない', value: 'none', pts: 0 },
-                    { label: '黒い点が見える', value: 'spots', pts: 1 },
-                    { label: '黒いカスが出ることがある', value: 'debris', pts: 3 },
+                    { label: '黒い点が見える', value: 'spots', pts: 3 },
+                    { label: '黒いカスが出ることがある', value: 'debris', pts: 5 },
                 ],
             },
             family: {
@@ -936,8 +1055,8 @@
                 note: '',
                 choices: [
                     { label: '子供のみいる', value: 'child', pts: 0 },
-                    { label: 'ペットのみ飼っている', value: 'pet', pts: 1 },
-                    { label: '両方いる', value: 'both', pts: 2 },
+                    { label: 'ペットのみ飼っている', value: 'pet', pts: 3 },
+                    { label: '両方いる', value: 'both', pts: 3 },
                     { label: 'どちらもいない', value: 'none', pts: 0 },
                 ],
             },
@@ -946,7 +1065,7 @@
                 note: '',
                 choices: [
                     { label: '変わらない', value: 'same', pts: 0 },
-                    { label: '少し弱い気がする', value: 'slight', pts: 1 },
+                    { label: '少し弱い気がする', value: 'slight', pts: 3 },
                     { label: '明らかに悪い', value: 'bad', pts: 5 },
                 ],
             },
@@ -969,9 +1088,10 @@
                 o7: { title: '使用年数が7年以上', desc: '長年の使用で内部の汚れが蓄積しやすい状態です。' },
             },
             frequency: {
-                season: { title: '夏のみ・冬のみ使用している', desc: '稼働期間が長い分、内部にホコリがたまりやすくなります。' },
-                both: { title: '夏と冬に使用している', desc: '稼働期間が長い分、内部にホコリやカビがたまりやすくなります。' },
-                all: { title: '一年中使用している', desc: '稼働時間が長く、内部にホコリやカビがたまりやすい状態です。' },
+                summer: { title: '夏の冷房で使用している', desc: '冷房を使うとエアコン内部に結露が発生し、カビが繁殖しやすくなります。' },
+                winter: { title: '冬の暖房で使用している', desc: '稼働中に吸い込んだホコリが内部にたまっていきます。' },
+                both: { title: '夏と冬に使用している', desc: '稼働期間が長いうえ、冷房時の結露もあり、ホコリやカビがたまりやすくなります。' },
+                all: { title: 'ほぼ1年中使用している', desc: '稼働時間が長く、内部にホコリやカビがたまりやすい状態です。' },
             },
             smell: {
                 later: { title: 'つけ始めのニオイが気になる', desc: '内部でカビが発生し始めているサインかもしれません。' },
@@ -996,8 +1116,8 @@
         // 質問を出す順番（lastTypeはクリーニング経験者のみ）
         const ORDER = ['timing', 'lastType', 'years', 'frequency', 'smell', 'dust', 'family', 'efficiency'];
 
-        // 汚れ点数の最大値（timing5 + lastType1 + years5 + frequency5 + smell3 + dust3 + family2 + efficiency5）
-        const MAX_PTS = 29;
+        // 汚れ点数の最大値（timing5 + lastType2 + years5 + frequency5 + smell5 + dust5 + family3 + efficiency5）
+        const MAX_PTS = 35;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1047,6 +1167,12 @@
             let score = Math.max(5, Math.min(95, total));
             // 4年以上お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
             if (isLongNeglect()) score = Math.max(score, 45);
+            // ニオイ・黒い汚れ・効きの低下が複数出ている場合、
+            // 使用年数などが浅くても内部に汚れがたまっているため、キレイ度に上限を設ける
+            // （点数は8問の平均なので、2〜3問だけでは下がりきらない。症状の数に応じて段階的に押さえる）
+            const symp = symptomCount();
+            if (symp >= 3) score = Math.max(score, 62);      // キレイ度 38%以下
+            else if (symp >= 2) score = Math.max(score, 50); // キレイ度 50%以下
             return score;
         }
 
@@ -1058,8 +1184,16 @@
             { min: 0, text: 'とてもキレイな状態です', hue: 200 },
         ];
 
+        // 状態フレーズと色を決める。
+        // 黒い点やカスが実際に見えている人は、合計点が低くても「とてもキレイ」とは表示しない。
+        // （点数は8問の平均なので1問だけでは下がりきらず、
+        //   「とてもキレイ」＋「完全分解をおすすめ」という矛盾が出てしまうため）
         function levelInfo(score) {
-            return LEVELS.find((lv) => score >= lv.min) || LEVELS[LEVELS.length - 1];
+            const info = LEVELS.find((lv) => score >= lv.min) || LEVELS[LEVELS.length - 1];
+            if (hasDirtSign() && info.min === 0) {
+                return LEVELS.find((lv) => lv.min === 20);
+            }
+            return info;
         }
 
         // 汚れスコアに応じた状態フレーズ（キレイ度80%以上を「とてもキレイ」の基準とし、各段階を10%ずつ引き上げ）
@@ -1101,10 +1235,24 @@
         }
 
         // ===== 症状の数（ニオイ・カス・効き） =====
+        // 「黒い点が見える」「黒いカスが出る」＝実際に目で見えた汚れのサイン。
+        // 「見たことがない」は"確認できていない"だけで汚れのサインではないため含めない。
+        function hasDirtSign() {
+            if (!answers.dust) return false;
+            return answers.dust.value === 'spots' || answers.dust.value === 'debris';
+        }
+
+        // 「すぐ臭う」「常に臭う」＝ニオイがはっきり出ている状態。
+        // 判定は点数ではなく選んだ選択肢そのもので見る（配点を変えても条件がズレないようにするため）
+        function isStrongSmell() {
+            if (!answers.smell) return false;
+            return answers.smell.value === 'soon' || answers.smell.value === 'always';
+        }
+
         function symptomCount() {
             let n = 0;
             if (answers.smell && answers.smell.pts > 0) n++;
-            if (answers.dust && answers.dust.pts > 0) n++;
+            if (hasDirtSign()) n++;
             if (answers.efficiency && answers.efficiency.pts > 0) n++;
             return n;
         }
@@ -1117,8 +1265,8 @@
                 else if (answers.dust.value === 'spots') reasons.push('黒い汚れがはっきり見える');
                 else if (answers.dust.value === 'never_checked') reasons.push('内部の汚れを目視で確認できていない');
             }
-            if (answers.smell && answers.smell.pts >= 2) reasons.push('ニオイがかなり気になる');
-            else if (answers.smell && answers.smell.pts === 1) reasons.push('つけ始めのニオイが気になる');
+            if (isStrongSmell()) reasons.push('ニオイがかなり気になる');
+            else if (answers.smell && answers.smell.value === 'later') reasons.push('つけ始めのニオイが気になる');
             if (answers.timing) {
                 if (answers.timing.value === 'o4') reasons.push('4年以上クリーニングしていない');
                 if (answers.timing.value === 'never') reasons.push('クリーニングを一度もしたことがない');
@@ -1271,7 +1419,7 @@
 
             // あなたの場合（おすすめ）
             const reasons = fullReasons();
-            const recommendFull = isLongNeglect() || (answers.dust && answers.dust.pts >= 1) || (answers.smell && answers.smell.pts >= 2) || score >= 50 || (answers.lastType && answers.lastType.value !== 'full' && score >= 20);
+            const recommendFull = isLongNeglect() || hasDirtSign() || isStrongSmell() || score >= 50 || (answers.lastType && answers.lastType.value !== 'full' && score >= 20);
             const recReasons = $('recReasons');
             if (recommendFull) {
                 $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>を<br>おすすめします！';
@@ -1292,6 +1440,10 @@
                 recReasons.classList.add('hidden');
             }
 
+            // 見積もりアプリへ診断結果を引き継ぐ（キレイ度とおすすめ内容）
+            const recKey = recommendFull ? 'full' : (score >= 20 ? 'soon' : 'none');
+            $('mitumoriBtn').href = `${MITUMORI_URL}?clean=${cleanScore}&rec=${recKey}`;
+
             // お子様・ペット
             const fam = familyText();
             const famBox = $('familyBox');
@@ -1301,6 +1453,9 @@
             } else {
                 famBox.classList.add('hidden');
             }
+
+            // 見積もりページから戻ってきたときに、この結果をそのまま復元できるようにしておく
+            saveAnswers();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1325,9 +1480,51 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        /* ===== 見積もりページから戻ってきたときの結果の復元 =====
+         * 見積もりページの「診断結果に戻る」から ?restore=1 付きで開かれた場合に、
+         * 直前の診断結果をそのまま復元する（もう一度answering し直さなくて済むように）。
+         * 保存先は sessionStorage なので、タブを閉じれば自動的に消える。
+         * 通常どおり開いたときは復元しないので、いつもの流れは変わらない。
+         */
+        const SAVE_KEY = 'kajiraku_shindan_answers';
+
+        function saveAnswers() {
+            try {
+                sessionStorage.setItem(SAVE_KEY, JSON.stringify(answers));
+            } catch (e) {
+                // プライベートモードなどで保存できない場合は、復元をあきらめるだけ
+            }
+        }
+
+        function restoreIfRequested() {
+            if (new URLSearchParams(window.location.search).get('restore') !== '1') return false;
+            let saved;
+            try {
+                saved = JSON.parse(sessionStorage.getItem(SAVE_KEY) || 'null');
+            } catch (e) {
+                return false;
+            }
+            if (!saved) return false;
+
+            // 全問そろっている場合だけ復元する（途中までの回答では結果を出せないため）
+            // shouldAsk は answers を見て分岐を判断するので、先に入れてから確認する
+            answers = saved;
+            if (!ORDER.every((k) => !shouldAsk(k) || answers[k])) {
+                answers = {};
+                return false;
+            }
+
+            $('startCard').classList.add('hidden');
+            $('progressArea').style.display = 'block';
+            showResult();
+            return true;
+        }
+
         $('startBtn').addEventListener('click', advance);
         $('backBtn').addEventListener('click', goBack);
         $('restartBtn').addEventListener('click', restart);
+
+        restoreIfRequested();
     </script>
 </body>
 

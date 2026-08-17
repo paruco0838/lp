@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エアコンクリーニング かんたん見積もり | カジラク</title>
+    <meta name="description" content="メニューと台数を選ぶだけで、エアコンクリーニングの料金がその場でわかる無料の見積もりツールです。">
+    <style>
+        :root {
+            /* カジラクのLINE料金表に合わせた配色 */
+            --teal: #3fa2ae;
+            /* メイン（青緑） */
+            --teal-dark: #2b8996;
+            --teal-deep: #1f6f7b;
+            --teal-pale: #e2f1f3;
+            --orange: #e7600d;
+            /* 料金の色 */
+            --orange-dark: #c44f06;
+            --yellow: #e0c44b;
+            --line: #06c755;
+            --line-dark: #049640;
+            --ink: #1f3a48;
+            /* 文字（濃紺グレー） */
+            --muted: #6d7f88;
+            --border: #d9d5c8;
+            /* クリーム系の枠線 */
+            --border-soft: #e7e3d8;
+            --bg: #f0eee7;
+            /* 背景（クリーム） */
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, "system-ui", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap {
+            max-width: 560px;
+            margin: 0 auto;
+            /* 下部の合計バーに隠れないよう、下に余白を多めに取る */
+            padding: 16px 16px 140px;
+        }
+
+        /* ── ヘッダー ───────────────── */
+        .site-header {
+            text-align: center;
+            padding: 14px 0 6px;
+        }
+
+        .site-header .badge {
+            display: inline-block;
+            background: var(--teal);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+            letter-spacing: .06em;
+        }
+
+        .site-header h1 {
+            font-size: 22px;
+            color: var(--teal-deep);
+            font-weight: 900;
+            line-height: 1.4;
+            letter-spacing: .08em;
+        }
+
+        .site-header p.lead {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── ステップ表示 ───────────────── */
+        .steps {
+            display: flex;
+            gap: 6px;
+            margin: 16px 0 14px;
+        }
+
+        .steps li {
+            flex: 1;
+            list-style: none;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            padding-top: 8px;
+            border-top: 3px solid var(--border);
+        }
+
+        .steps li.is-active {
+            color: var(--teal-dark);
+            border-top-color: var(--teal);
+        }
+
+        .steps li.is-done {
+            color: var(--teal-deep);
+            border-top-color: var(--teal-deep);
+        }
+
+        /* ── カード ───────────────── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(60, 50, 30, .05);
+        }
+
+        /* 見出しは料金表と同じ「青緑の帯」風にする */
+        h2.sec-title {
+            font-size: 16.5px;
+            font-weight: 900;
+            color: var(--teal-deep);
+            margin-bottom: 4px;
+            padding-left: 10px;
+            border-left: 5px solid var(--teal);
+            letter-spacing: .04em;
+            line-height: 1.4;
+        }
+
+        p.sec-note {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        /* ── メニュー1行 ───────────────── */
+        .item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-soft);
+        }
+
+        /* メニュー1つぶんのブロック（通常／完全分解の2行を縦に持つ） */
+        .menu-block {
+            display: block;
+        }
+
+        .mi-variant {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 4px 0;
+        }
+
+        .mi-variant.is-recommended {
+            background: #fff8f2;
+            border-radius: 6px;
+            padding: 4px 6px;
+            margin: 0 -6px;
+        }
+
+        .mi-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+            padding-bottom: 2px;
+        }
+
+        .item-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.45;
+            letter-spacing: .02em;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .item-price {
+            font-size: 15.5px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+
+        /* 「通常 8,500円」のような料金タグ */
+        .pd {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--muted);
+            background: #faf9f5;
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 2px 6px;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 3px;
+            white-space: nowrap;
+        }
+
+        .pd b {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+
+        .pd-full {
+            border-color: var(--teal);
+            background: var(--teal-pale);
+            color: var(--teal-deep);
+        }
+
+        .item-stars {
+            color: var(--ink);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        /* ── ＋− カウンター ───────────────── */
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .counter button {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1.5px solid var(--teal);
+            background: var(--white);
+            color: var(--teal-dark);
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .counter button:active {
+            transform: scale(.92);
+        }
+
+        .counter button:disabled {
+            opacity: .35;
+            cursor: default;
+        }
+
+        .counter .qty {
+            width: 34px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--ink);
+        }
+
+        .counter .qty.is-zero {
+            color: #c2c8cb;
+        }
+
+        /* ── 注記ボックス ───────────────── */
+        .note {
+            background: #fff8ec;
+            border: 1px solid #f6dcb0;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 12px;
+            color: #7a5a20;
+            line-height: 1.65;
+        }
+
+        .note strong {
+            color: var(--orange-dark);
+        }
+
+        .note ul {
+            margin: 5px 0 0 16px;
+        }
+
+        /* ── ボタン ───────────────── */
+        .btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 12px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: scale(.985);
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: #fff;
+            box-shadow: 0 4px 0 var(--teal-deep);
+            letter-spacing: .04em;
+        }
+
+        .btn-primary:disabled {
+            background: #c3c9c6;
+            box-shadow: 0 4px 0 #a7aeab;
+            cursor: default;
+        }
+
+        .btn-line {
+            background: var(--line);
+            color: #fff;
+            box-shadow: 0 4px 0 var(--line-dark);
+        }
+
+        .btn-ghost {
+            background: var(--white);
+            color: var(--teal-deep);
+            border: 1.5px solid var(--teal);
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-row .btn {
+            margin: 0;
+        }
+
+        /* ── 下部固定バー ───────────────── */
+        .bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, .98);
+            border-top: 2px solid var(--teal);
+            box-shadow: 0 -6px 20px rgba(60, 50, 30, .10);
+            padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+            z-index: 50;
+        }
+
+        .bar-inner {
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .bar-total {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .bar-total .label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .bar-total .amount {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+
+        .bar-total .amount .yen {
+            font-size: 14px;
+            margin-left: 1px;
+        }
+
+        /* ── 結果画面 ───────────────── */
+        .result-head {
+            text-align: center;
+            padding: 6px 0 14px;
+        }
+
+        .result-head .amount {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--orange);
+            line-height: 1.1;
+        }
+
+        .result-head .amount .yen {
+            font-size: 19px;
+        }
+
+        .result-head .tax {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .bd-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 13.5px;
+            padding: 7px 0;
+            border-bottom: 1px dotted var(--border-soft);
+        }
+
+        .bd-row .bd-name {
+            color: var(--ink);
+        }
+
+        .bd-row .bd-val {
+            font-weight: 800;
+            white-space: nowrap;
+            color: var(--ink);
+        }
+
+        .bd-row.is-discount .bd-name,
+        .bd-row.is-discount .bd-val {
+            color: #1f9d55;
+        }
+
+        .bd-row.is-total {
+            border-bottom: none;
+            border-top: 2px solid var(--teal);
+            margin-top: 6px;
+            padding-top: 10px;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .bd-group {
+            font-size: 12px;
+            font-weight: 900;
+            color: #fff;
+            background: var(--teal);
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin: 14px 0 4px;
+            letter-spacing: .08em;
+        }
+
+        .bd-group:first-child {
+            margin-top: 0;
+        }
+
+        /* タイプごとの枠（LINEの料金表と同じ「見出し帯つきの箱」） */
+        .menu-group-box {
+            border: 1.5px solid var(--teal);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            background: var(--white);
+        }
+
+        .menu-group-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-group-head {
+            background: var(--teal);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 900;
+            padding: 7px 14px;
+            letter-spacing: .1em;
+        }
+
+        .menu-group-body {
+            padding: 2px 12px 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ── 診断結果の引き継ぎ表示 ───────────────── */
+        .shindan-banner {
+            background: var(--teal-pale);
+            border: 1px solid var(--teal);
+        }
+
+        .sb-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .sb-badge {
+            background: var(--teal);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: .08em;
+        }
+
+        .sb-score {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--teal-deep);
+        }
+
+        .sb-score strong {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+
+        .sb-text {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--ink);
+        }
+
+        /* オプションの「診断おすすめ」バッジ */
+        .rec-badge {
+            display: inline-block;
+            background: var(--orange);
+            color: #fff;
+            font-size: 10.5px;
+            font-weight: 900;
+            padding: 1px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: 2px;
+            letter-spacing: .04em;
+        }
+
+        .item.is-recommended {
+            background: #fff8f2;
+            margin: 0 -8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            border-radius: 6px;
+        }
+
+        /* 見積もり結果から診断結果へ戻るリンク */
+        .back-shindan {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .back-shindan a {
+            color: var(--muted);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1px;
+        }
+
+        /* 診断ページへの誘導 */
+        .shindan-link {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-top: 2px;
+        }
+
+        .shindan-link a {
+            color: var(--teal-dark);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid var(--teal);
+        }
+
+        .disclaimer {
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="site-header">
+            <span class="badge">エアコン掃除のカジラク</span>
+            <h1>かんたん見積もり</h1>
+            <p class="lead">選ぶだけで料金がすぐわかります</p>
+        </header>
+
+        <ol class="steps" id="steps">
+            <li data-step="1" class="is-active">1. メニュー</li>
+            <li data-step="2">2. オプション</li>
+            <li data-step="3">3. お見積もり</li>
+        </ol>
+
+        <!-- ── ステップ1：メニュー ───────────────── -->
+        <section id="screen-1">
+            <!-- 診断ページから来た場合だけ表示される -->
+            <div class="card shindan-banner hidden" id="shindan-banner">
+                <div class="sb-head">
+                    <span class="sb-badge">診断結果</span>
+                    <span class="sb-score">キレイ度 <strong id="sb-score">-</strong>%</span>
+                </div>
+                <p class="sb-text" id="sb-text"></p>
+            </div>
+
+            <div class="card">
+                <h2 class="sec-title">クリーニングするエアコンを選ぶ</h2>
+                <p class="sec-note">台数を「＋」で増やしてください。複数タイプの組み合わせもOKです。</p>
+                <div id="menu-list"></div>
+            </div>
+
+            <!-- 診断ページから来た場合は非表示にする -->
+            <p class="shindan-link" id="shindan-link-wrap">
+                クリーニングが必要かどうか迷ったら<br>
+                <a href="#" id="shindan-link">▶ エアコンキレイ度診断でチェックする</a>
+            </p>
+        </section>
+
+        <!-- ── ステップ2：オプション ───────────────── -->
+        <section id="screen-2" class="hidden">
+            <div class="card">
+                <h2 class="sec-title">オプションを選ぶ</h2>
+                <p class="sec-note">つけなくてもOKです。台数分まで選べます。</p>
+                <div id="option-list"></div>
+            </div>
+        </section>
+
+        <!-- ── ステップ3：見積もり結果 ───────────────── -->
+        <section id="screen-3" class="hidden">
+            <div class="card">
+                <div class="result-head">
+                    <p class="sec-note" style="margin-bottom:2px">お見積もり金額（概算）</p>
+                    <div class="amount"><span id="result-amount">0</span><span class="yen">円</span></div>
+                    <p class="tax">税込</p>
+                </div>
+                <div id="breakdown"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="sec-title">ご相談・ご予約はLINEで</h2>
+                <p class="sec-note">この画面のスクリーンショットを添えてお送りいただくと、やり取りがスムーズです。</p>
+                <a class="btn btn-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">LINEで相談・予約する</a>
+                <div class="btn-row">
+                    <button class="btn btn-ghost" id="btn-restart">やり直す</button>
+                </div>
+                <!-- 診断ページから来た場合だけ表示する -->
+                <p class="back-shindan hidden" id="back-shindan-wrap">
+                    <a href="#" id="btn-back-shindan">← 診断結果に戻る</a>
+                </p>
+            </div>
+
+            <p class="disclaimer">
+                ※ 表示金額は税込の概算です。機種・設置状況により、当日までに金額が変わる場合があります。<br>
+                ※ 有料駐車場をご利用いただく場合は、実費のご負担をお願いしております。<br>
+                ※ 正式なお見積もりは、ご予約後の確認をもってご案内いたします。
+            </p>
+        </section>
+    </div>
+
+    <!-- ── 下部固定バー ───────────────── -->
+    <div class="bar" id="bar">
+        <div class="bar-inner">
+            <div class="bar-total">
+                <span class="label" id="bar-label">合計（税込）</span>
+                <span class="amount"><span id="bar-amount">0</span><span class="yen">円</span></span>
+            </div>
+            <div class="btn-row" style="margin-top:0">
+                <button class="btn btn-ghost hidden" id="btn-back" style="flex:0 0 90px">戻る</button>
+                <button class="btn btn-primary" id="btn-next" disabled>オプションを選ぶ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        /* ===================================================================
+         * 【料金設定】金額を変えるときは、この中の数字だけ書き換えてください。
+         * price … 1台あたりの料金（税込・円）
+         * hours … 作業時間の目安 [最短, 最長]（時間）※現在は画面に表示していません
+         * =================================================================== */
+        var PRICING = {
+            // キレイ度診断ページのURL（同じ場所に置く場合はこのままでOK）
+            shindanUrl: 'shindan.html',
+
+            // 2台目以降の割引額（1台につき）。割引をやめる場合は 0 にしてください。
+            multiUnitDiscount: 500,
+
+            // 完全分解洗浄の追加料金（1台につき）
+            fullExtra: 10000,
+
+            // name … 選択画面での表示名（グループ見出しと組み合わせて読む短い名前）
+            // longName … 見積もり内訳での表示名（単体で読んでも分かる正式名）
+            // full … 完全分解に対応しているか（壁掛けエアコンのみ true）
+            menus: [
+                { id: 'wall_normal', name: '通常エアコン', longName: '壁掛け 通常エアコン', group: '壁掛けタイプ（家庭用）', full: true, price: 8500, hours: [1, 1.5] },
+                { id: 'wall_auto', name: 'お掃除機能付きエアコン', longName: '壁掛け お掃除機能付きエアコン', group: '壁掛けタイプ（家庭用）', full: true, price: 15500, hours: [1.5, 2] },
+                { id: 'ceiling_1', name: '家庭用 1方向', longName: '家庭用 天井埋込 1方向エアコン', group: '天井埋込タイプ', full: false, price: 17000, hours: [1.5, 2.5] },
+                { id: 'ceiling_2', name: '家庭用 2方向', longName: '家庭用 天井埋込 2方向エアコン', group: '天井埋込タイプ', full: false, price: 18000, hours: [1.5, 2.5] },
+                { id: 'ceiling_4', name: '業務用 4方向', longName: '業務用 天井埋込 4方向エアコン', group: '天井埋込タイプ', full: false, price: 22000, hours: [2.5, 3.5] },
+                { id: 'wall_in', name: '壁埋込形エアコン', longName: '壁埋込形エアコン', group: '壁埋込タイプ', full: false, price: 16000, hours: [1.5, 2] }
+            ],
+
+            // ※完全分解洗浄はオプションではなく、メニュー画面の「完全分解」の行で選ぶ方式
+            options: [
+                { id: 'mold', name: '防カビ抗菌コーティング', price: 3000, stars: 5, desc: 'クリーニングの効果を長持ちさせます' },
+                // includedInFull … 完全分解に含まれる作業なので、完全分解を選んだ台数分は選べないようにする
+                { id: 'drainpan', name: 'ドレンパン分解洗浄', price: 4000, stars: 5, includedInFull: true, desc: '水漏れ・カビのニオイを極力解消したい方に' },
+                { id: 'drainhose', name: 'ドレンホース洗浄', price: 3000, stars: 5, desc: '水漏れなどを防ぎやすくします' },
+                { id: 'outdoor', name: '室外機洗浄', price: 3000, stars: 3, desc: '電気効率が良くなり、冷房の効きや電気代削減につながります' },
+                { id: 'cap', name: '防虫キャップ', price: 1000, stars: 3, desc: '虫の出入りを防ぎます' }
+            ]
+        };
+
+        /* ===================================================================
+         * ここから下は、通常の運用では触る必要はありません。
+         * =================================================================== */
+
+        var state = {
+            step: 1,
+            menuQty: {},   // { メニューid: 台数 }
+            optionQty: {}, // { オプションid: 個数 }
+            shindan: null  // 診断ページから引き継いだ結果
+        };
+
+        var $ = function (id) { return document.getElementById(id); };
+        var yen = function (n) { return n.toLocaleString('ja-JP'); };
+
+        /* ── 診断ページからの引き継ぎ ─────────────────
+         * 診断ページから ?clean=47&rec=full の形で結果を受け取る。
+         *   clean … キレイ度（％）
+         *   rec   … full  = 完全分解クリーニングがおすすめ
+         *           soon  = そろそろクリーニングがおすすめ
+         *           none  = 今すぐは必須ではない
+         * 診断を通らず直接開いた場合は、何も表示しない。
+         * ───────────────────────────────────────── */
+        var SHINDAN_MESSAGES = {
+            full: {
+                // キレイ度が高めでも「黒い点が見える」等で完全分解をすすめる場合があるため、
+                // 汚れ具合を断定せず、おすすめ内容を伝える文言にしている
+                text: '診断の結果、奥まで洗浄できる「完全分解」がおすすめです。通常のクリーニングでは落としきれない、カビやニオイの原因まで取り除けます。',
+                options: []
+            },
+            soon: {
+                text: 'そろそろクリーニングの検討時期です。大きな症状が出る前のお掃除が、費用も時間も一番おトクです。',
+                options: []
+            },
+            none: {
+                text: '今すぐのクリーニングは必須ではなさそうです。良い状態をキープするために、2年に1度を目安にした分解洗浄がおすすめです。',
+                options: []
+            }
+        };
+
+        function readShindanResult() {
+            var params = new URLSearchParams(window.location.search);
+            var rec = params.get('rec');
+            var clean = parseInt(params.get('clean'), 10);
+
+            if (!SHINDAN_MESSAGES[rec]) return null;
+
+            return {
+                rec: rec,
+                clean: (isNaN(clean) || clean < 0 || clean > 100) ? null : clean,
+                message: SHINDAN_MESSAGES[rec].text,
+                recommendedOptions: SHINDAN_MESSAGES[rec].options
+            };
+        }
+
+        function isRecommended(optionId) {
+            return !!(state.shindan && state.shindan.recommendedOptions.indexOf(optionId) !== -1);
+        }
+
+        function setupShindan() {
+            $('shindan-link').href = PRICING.shindanUrl;
+            state.shindan = readShindanResult();
+            if (!state.shindan) return;
+
+            // 診断から来た人には、診断への誘導リンクは出さず、かわりに戻るリンクを出す
+            $('shindan-link-wrap').classList.add('hidden');
+            $('back-shindan-wrap').classList.remove('hidden');
+            // restore=1 を付けると、診断ページが直前の結果をそのまま出し直してくれる
+            // （ブラウザの「戻る」だと、端末によっては最初からやり直しになってしまうため）
+            $('btn-back-shindan').href = PRICING.shindanUrl + '?restore=1';
+
+            var banner = $('shindan-banner');
+            banner.classList.remove('hidden');
+            $('sb-text').textContent = state.shindan.message;
+
+            if (state.shindan.clean === null) {
+                // キレイ度が渡ってこなかった場合は数値部分を隠す
+                $('sb-score').parentNode.style.display = 'none';
+            } else {
+                $('sb-score').textContent = state.shindan.clean;
+            }
+        }
+
+        /* ── 集計 ───────────────── */
+
+        // 完全分解の台数は「メニューid + '__full'」のキーで数える
+        function fullKey(id) { return id + '__full'; }
+
+        // 選択中の合計台数（通常＋完全分解）
+        function totalUnits() {
+            var n = 0;
+            PRICING.menus.forEach(function (m) {
+                n += (state.menuQty[m.id] || 0) + (state.menuQty[fullKey(m.id)] || 0);
+            });
+            return n;
+        }
+
+        // 通常クリーニングで選んだ台数（完全分解を除く）
+        function normalUnits() {
+            var n = 0;
+            PRICING.menus.forEach(function (m) { n += (state.menuQty[m.id] || 0); });
+            return n;
+        }
+
+        // そのオプションを付けられる上限台数
+        // 完全分解にすでに含まれる作業は、通常クリーニングの台数までしか選べない
+        function optionCap(o) {
+            return o.includedInFull ? normalUnits() : totalUnits();
+        }
+
+        // 金額を計算して内訳つきで返す
+        function calc() {
+            var menuLines = [], optionLines = [], subtotal = 0;
+
+            PRICING.menus.forEach(function (m) {
+                var qn = state.menuQty[m.id] || 0;
+                var qf = state.menuQty[fullKey(m.id)] || 0;
+                if (qn) {
+                    subtotal += m.price * qn;
+                    menuLines.push({ name: (m.longName || m.name), qty: qn, unit: '台', amount: m.price * qn });
+                }
+                if (qf) {
+                    var fp = m.price + PRICING.fullExtra;
+                    subtotal += fp * qf;
+                    menuLines.push({ name: (m.longName || m.name) + '（完全分解）', qty: qf, unit: '台', amount: fp * qf });
+                }
+            });
+
+            PRICING.options.forEach(function (o) {
+                var q = state.optionQty[o.id] || 0;
+                if (!q) return;
+                var amount = o.price * q;
+                subtotal += amount;
+                optionLines.push({ name: o.name, qty: q, unit: '台分', amount: amount });
+            });
+
+            // 2台目以降の割引（オプションは対象外）
+            var units = totalUnits();
+            var discount = units > 1 ? (units - 1) * PRICING.multiUnitDiscount : 0;
+
+            return {
+                menuLines: menuLines,
+                optionLines: optionLines,
+                subtotal: subtotal,
+                discount: discount,
+                discountUnits: units > 1 ? units - 1 : 0,
+                total: Math.max(0, subtotal - discount),
+                units: units
+            };
+        }
+
+        /* ── 画面の組み立て ───────────────── */
+
+        function stars(n) {
+            return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+        }
+
+        // 「通常 8,500円」のような料金タグを1つ作る
+        function buildPriceTag(label, price, cls) {
+            var tag = document.createElement('span');
+            tag.className = 'pd' + (cls ? ' ' + cls : '');
+            tag.appendChild(document.createTextNode(label));
+            var b = document.createElement('b');
+            b.textContent = yen(price) + '円';
+            tag.appendChild(b);
+            return tag;
+        }
+
+        // ＋− のカウンターを作る（key は menuQty / optionQty のキー）
+        function makeCounter(kind, key, label, q, plusDisabled) {
+            var counter = document.createElement('div');
+            counter.className = 'counter';
+
+            var minus = document.createElement('button');
+            minus.type = 'button';
+            minus.textContent = '−';
+            minus.setAttribute('aria-label', label + 'を減らす');
+            minus.disabled = q <= 0;
+            minus.addEventListener('click', function () { changeQty(kind, key, -1); });
+
+            var qty = document.createElement('span');
+            qty.className = 'qty' + (q ? '' : ' is-zero');
+            qty.textContent = q;
+
+            var plus = document.createElement('button');
+            plus.type = 'button';
+            plus.textContent = '＋';
+            plus.setAttribute('aria-label', label + 'を増やす');
+            plus.disabled = !!plusDisabled;
+            plus.addEventListener('click', function () { changeQty(kind, key, 1); });
+
+            counter.appendChild(minus);
+            counter.appendChild(qty);
+            counter.appendChild(plus);
+            return counter;
+        }
+
+        // メニュー1つぶんのブロック（通常／完全分解の2行それぞれにカウンター付き）
+        function buildMenuBlock(m) {
+            var block = document.createElement('div');
+            block.className = 'item menu-block';
+
+            var name = document.createElement('div');
+            name.className = 'item-name';
+            name.textContent = m.name;
+            block.appendChild(name);
+
+            block.appendChild(buildVariantRow(m, false));
+            // 完全分解は対応メニュー（壁掛けエアコン）だけに出す
+            if (m.full) block.appendChild(buildVariantRow(m, true));
+
+            return block;
+        }
+
+        // 「通常」または「完全分解」の1行（料金タグ＋カウンター）
+        function buildVariantRow(m, isFull) {
+            var key = isFull ? fullKey(m.id) : m.id;
+            var price = isFull ? m.price + PRICING.fullExtra : m.price;
+            var q = state.menuQty[key] || 0;
+
+            var row = document.createElement('div');
+            row.className = 'mi-variant';
+
+            var left = document.createElement('div');
+            left.className = 'mi-left';
+            left.appendChild(buildPriceTag(isFull ? '完全分解' : '通常', price, isFull ? 'pd-full' : ''));
+
+            // 診断で完全分解おすすめの人には、完全分解の行にバッジを付ける
+            if (isFull && state.shindan && state.shindan.rec === 'full') {
+                var rec = document.createElement('span');
+                rec.className = 'rec-badge';
+                rec.textContent = '診断おすすめ';
+                left.appendChild(rec);
+                row.classList.add('is-recommended');
+            }
+
+            row.appendChild(left);
+            row.appendChild(makeCounter('menu', key, m.name + (isFull ? '（完全分解）' : '（通常）'), q, false));
+            return row;
+        }
+
+        // オプション1行ぶん
+        function buildRow(item, kind) {
+            var q = state.optionQty[item.id] || 0;
+
+            var row = document.createElement('div');
+            row.className = 'item';
+
+            var body = document.createElement('div');
+            body.className = 'item-body';
+
+            var name = document.createElement('div');
+            name.className = 'item-name';
+            name.textContent = item.name;
+            if (isRecommended(item.id)) {
+                row.classList.add('is-recommended');
+                var rec = document.createElement('span');
+                rec.className = 'rec-badge';
+                rec.textContent = '診断おすすめ';
+                name.appendChild(rec);
+            }
+            body.appendChild(name);
+
+            var meta = document.createElement('div');
+            meta.className = 'item-meta';
+            var price = document.createElement('span');
+            price.className = 'item-price';
+            price.textContent = yen(item.price) + '円';
+            meta.appendChild(price);
+            meta.appendChild(document.createTextNode('／台　'));
+            var st = document.createElement('span');
+            st.className = 'item-stars';
+            st.textContent = stars(item.stars);
+            meta.appendChild(st);
+            body.appendChild(meta);
+
+            if (item.desc) {
+                var desc = document.createElement('div');
+                desc.className = 'item-meta';
+                desc.textContent = item.desc;
+                body.appendChild(desc);
+            }
+
+            row.appendChild(body);
+            // オプションは選んだ台数分までしか付けられない
+            row.appendChild(makeCounter('option', item.id, item.name, q, q >= optionCap(item)));
+
+            return row;
+        }
+
+        function renderMenus() {
+            var list = $('menu-list');
+            list.textContent = '';
+            var body = null, lastGroup = null, fullNoteTarget = null;
+            PRICING.menus.forEach(function (m) {
+                // タイプごとに「見出し帯つきの枠」で囲んで、ブロックの区切りをはっきりさせる
+                if (m.group !== lastGroup) {
+                    var box = document.createElement('div');
+                    box.className = 'menu-group-box';
+                    var head = document.createElement('div');
+                    head.className = 'menu-group-head';
+                    head.textContent = m.group;
+                    box.appendChild(head);
+                    body = document.createElement('div');
+                    body.className = 'menu-group-body';
+                    box.appendChild(body);
+                    list.appendChild(box);
+                    lastGroup = m.group;
+                }
+                body.appendChild(buildMenuBlock(m));
+                // 完全分解に対応しているグループ（壁掛け）に説明を出す
+                if (m.full) fullNoteTarget = body;
+            });
+
+            if (fullNoteTarget) {
+                var note = document.createElement('div');
+                note.className = 'note';
+                note.style.margin = '10px 0 4px';
+                note.innerHTML = '<strong>「完全分解」とは？</strong><br>ほぼ全てのパーツを分解し、カビやニオイの原因まで徹底的に洗浄する方法です（通常＋10,000円／台）。壁掛けエアコンのみ対応しています。';
+                fullNoteTarget.appendChild(note);
+
+                // 別途料金がかかる型番の案内
+                var models = document.createElement('div');
+                models.className = 'note';
+                models.style.margin = '10px 0 4px';
+                models.innerHTML = '※下記型番の場合のみ別途料金がかかります。<br>'
+                    + '└富士通ノクリア X・Zシリーズ<br>'
+                    + '└日立 しろくまくん JT・Xシリーズ<br>'
+                    + '└三菱 FZシリーズ<br>'
+                    + '└シャープ エアレストシリーズ<br>'
+                    + '└ダイキンうるさらシリーズ（完全分解のみ）<br><br>'
+                    + '詳細はLINEよりお問い合わせください。';
+                fullNoteTarget.appendChild(models);
+            }
+        }
+
+        function renderOptions() {
+            var list = $('option-list');
+            list.textContent = '';
+
+            PRICING.options.forEach(function (o) {
+                // 付けられる台数が0のオプションは出さない
+                // （例：全台を完全分解にした場合のドレンパン分解洗浄）
+                if (optionCap(o) === 0) return;
+                list.appendChild(buildRow(o, 'option'));
+            });
+        }
+
+        function changeQty(kind, id, delta) {
+            var store = kind === 'menu' ? state.menuQty : state.optionQty;
+            var next = (store[id] || 0) + delta;
+            if (next < 0) next = 0;
+
+            if (kind === 'option') {
+                // オプションは付けられる上限台数を超えないようにする
+                var opt = findOption(id);
+                var cap = opt ? optionCap(opt) : totalUnits();
+                if (next > cap) next = cap;
+            }
+            store[id] = next;
+
+            if (kind === 'menu') {
+                renderMenus();
+                clampOptions(); // 台数を減らしたらオプションも上限に合わせる
+            } else {
+                renderOptions();
+            }
+            updateBar();
+        }
+
+        function findOption(id) {
+            for (var i = 0; i < PRICING.options.length; i++) {
+                if (PRICING.options[i].id === id) return PRICING.options[i];
+            }
+            return null;
+        }
+
+        // 台数や内訳を変えたときに、オプション数が上限を超えないよう調整する
+        function clampOptions() {
+            var changed = false;
+            PRICING.options.forEach(function (o) {
+                var cap = optionCap(o);
+                if ((state.optionQty[o.id] || 0) > cap) { state.optionQty[o.id] = cap; changed = true; }
+            });
+            if (changed && state.step === 2) renderOptions();
+        }
+
+        /* ── 下部バーとステップ移動 ───────────────── */
+
+        function updateBar() {
+            var r = calc();
+            $('bar-amount').textContent = yen(r.total);
+
+            var next = $('btn-next');
+            if (state.step === 1) {
+                next.textContent = 'オプションを選ぶ';
+                next.disabled = r.units === 0;
+                $('btn-back').classList.add('hidden');
+                $('bar-label').textContent = r.units ? ('合計（税込）／ ' + r.units + '台') : '合計（税込）';
+            } else if (state.step === 2) {
+                next.textContent = 'お見積もりを見る';
+                next.disabled = false;
+                $('btn-back').classList.remove('hidden');
+                $('bar-label').textContent = '合計（税込）／ ' + r.units + '台';
+            }
+        }
+
+        function goStep(n) {
+            state.step = n;
+
+            [1, 2, 3].forEach(function (i) {
+                $('screen-' + i).classList.toggle('hidden', i !== n);
+            });
+
+            Array.prototype.forEach.call($('steps').children, function (li) {
+                var s = Number(li.dataset.step);
+                li.classList.toggle('is-active', s === n);
+                li.classList.toggle('is-done', s < n);
+            });
+
+            // 結果画面では下部バーを隠す
+            $('bar').classList.toggle('hidden', n === 3);
+
+            // 上限を超えた分を先に整えてから描き直す
+            clampOptions();
+            if (n === 2) renderOptions();
+            if (n === 3) renderResult();
+            updateBar();
+            window.scrollTo(0, 0);
+        }
+
+        /* ── 結果画面 ───────────────── */
+
+        function addRow(parent, name, val, cls) {
+            var row = document.createElement('div');
+            row.className = 'bd-row' + (cls ? ' ' + cls : '');
+            var a = document.createElement('span');
+            a.className = 'bd-name';
+            a.textContent = name;
+            var b = document.createElement('span');
+            b.className = 'bd-val';
+            b.textContent = val;
+            row.appendChild(a);
+            row.appendChild(b);
+            parent.appendChild(row);
+            return row;
+        }
+
+        function addGroup(parent, label) {
+            var g = document.createElement('div');
+            g.className = 'bd-group';
+            g.textContent = label;
+            parent.appendChild(g);
+        }
+
+        function renderResult() {
+            var r = calc();
+            $('result-amount').textContent = yen(r.total);
+
+            var bd = $('breakdown');
+            bd.textContent = '';
+
+            addGroup(bd, 'クリーニング');
+            r.menuLines.forEach(function (l) {
+                addRow(bd, l.name + ' × ' + l.qty + l.unit, yen(l.amount) + '円');
+            });
+
+            if (r.optionLines.length) {
+                addGroup(bd, 'オプション');
+                r.optionLines.forEach(function (l) {
+                    addRow(bd, l.name + ' × ' + l.qty + l.unit, yen(l.amount) + '円');
+                });
+            }
+
+            if (r.discount > 0) {
+                addGroup(bd, '割引');
+                addRow(bd, '複数台割引（2台目以降 ' + r.discountUnits + '台分）',
+                    '−' + yen(r.discount) + '円', 'is-discount');
+            }
+
+            addRow(bd, '合計（税込）', yen(r.total) + '円', 'is-total');
+        }
+
+        /* ── 起動 ───────────────── */
+
+        $('btn-next').addEventListener('click', function () {
+            goStep(state.step === 1 ? 2 : 3);
+        });
+
+        $('btn-back').addEventListener('click', function () {
+            goStep(state.step - 1);
+        });
+
+        $('btn-restart').addEventListener('click', function () {
+            state.menuQty = {};
+            state.optionQty = {};
+            renderMenus();
+            renderOptions();
+            goStep(1);
+        });
+
+        setupShindan();
+        renderMenus();
+        updateBar();
+    </script>
+</body>
+
+</html>
