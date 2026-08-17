@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洗濯機キレイ度診断 配点マップ（社内資料）</title>
+    <style>
+        :root {
+            --navy: #102840;
+            --blue: #2d8fd5;
+            --sky: #eaf6ff;
+            --orange: #f28b25;
+            --red: #d9493f;
+            --muted: #607080;
+            --border: #dce5ec;
+            --bg: #f6fbff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, "system-ui", "Hiragino Sans", "Yu Gothic", sans-serif;
+            background: var(--bg);
+            color: #1e2933;
+            line-height: 1.7;
+            padding: 24px 16px 64px;
+        }
+
+        .wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: var(--navy);
+        }
+
+        h2 {
+            font-size: 17px;
+            color: var(--navy);
+            margin: 32px 0 8px;
+            border-left: 5px solid var(--blue);
+            padding-left: 10px;
+        }
+
+        p.note {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            font-size: 13.5px;
+            margin-top: 8px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: var(--sky);
+            color: var(--navy);
+            white-space: nowrap;
+        }
+
+        td.pts {
+            text-align: center;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .warn {
+            background: #fdecea;
+            border: 1px solid #f5c6c1;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13.5px;
+            margin-top: 12px;
+        }
+
+        .box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13.5px;
+            margin-top: 8px;
+        }
+
+        code {
+            background: var(--sky);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 12.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <h1>🧺 洗濯機キレイ度診断 配点マップ</h1>
+        <p class="note">対象ファイル: <code>sentaku-shindan.html</code> ／ 2026-08-17 作成（社内資料・お客様には見せない）</p>
+
+        <div class="warn">
+            <b>⚠️ 配点を変える前に必ず守ること（エアコン診断で事故った箇所）</b><br>
+            ① 変更前に <code>grep 質問キー</code> で、点数を判定条件に使っている箇所がないか確認する<br>
+            ② 判定は点数ではなく選択肢の値（value）で行う → <code>hasDirtSign()</code> <code>isStrongSmell()</code><br>
+            ③ 変更後はブラウザで代表パターンを検算する（1問ごとに四捨五入してから合計するので手計算は合わない）<br>
+            ④ この資料の「配点表・計算式・満点・計算例」の4か所も忘れず更新する<br>
+            詳細: <code>tasks/lessons.md</code>
+        </div>
+
+        <h2>質問と配点（全8問・分岐なし）</h2>
+        <table>
+            <tr>
+                <th>キー</th>
+                <th>質問</th>
+                <th>選択肢</th>
+                <th>点</th>
+            </tr>
+            <tr>
+                <td rowspan="3"><code>type</code></td>
+                <td rowspan="3">洗濯機のタイプ<br><small>※料金表示にのみ使用</small></td>
+                <td>縦型洗濯機</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>ドラム式洗濯機</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>わからない</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>timing</code></td>
+                <td rowspan="4">前回の分解クリーニング</td>
+                <td>2年未満</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>2〜4年以内</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>4年以上</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td>したことがない</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>years</code></td>
+                <td rowspan="4">使用年数</td>
+                <td>1年未満</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>1〜3年</td>
+                <td class="pts">2</td>
+            </tr>
+            <tr>
+                <td>4〜6年</td>
+                <td class="pts">4</td>
+            </tr>
+            <tr>
+                <td>7年以上</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td rowspan="3"><code>cleaner</code></td>
+                <td rowspan="3">市販の洗濯槽クリーナー</td>
+                <td>月1回くらい使っている</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>数ヶ月に1回使っている</td>
+                <td class="pts">2</td>
+            </tr>
+            <tr>
+                <td>ほとんど使わない</td>
+                <td class="pts">4</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>frequency</code></td>
+                <td rowspan="4">洗濯の頻度</td>
+                <td>1日に2回以上</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td>1日に1回</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>2〜3日に1回</td>
+                <td class="pts">2</td>
+            </tr>
+            <tr>
+                <td>週1回程度</td>
+                <td class="pts">1</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>smell</code></td>
+                <td rowspan="4">ニオイ（生乾き臭・カビ臭）</td>
+                <td>気にならない</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>たまに気になる</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>よく気になる ★</td>
+                <td class="pts">4</td>
+            </tr>
+            <tr>
+                <td>いつも気になる ★</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>debris</code></td>
+                <td rowspan="4">黒いカス・ワカメ状の汚れ</td>
+                <td>気にしたことがない</td>
+                <td class="pts">2</td>
+            </tr>
+            <tr>
+                <td>付かない</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>たまに付く ★</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>よく付く ★</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>habits</code></td>
+                <td rowspan="4">ふだんの使い方</td>
+                <td>フタは開けて乾かす・残り湯は使わない</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>フタは閉めっぱなしにしがち</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>お風呂の残り湯を使っている</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>フタ閉めっぱなし＆残り湯も使う</td>
+                <td class="pts">5</td>
+            </tr>
+        </table>
+        <p class="note">★＝「汚れのサイン」に使う選択肢（ニオイ=よく/いつも、カス=たまに/よく）。判定は点数ではなく value で行う。</p>
+
+        <h2>計算式</h2>
+        <div class="box">
+            <b>満点（MAX_PTS）= 34点</b>（timing 5 + years 5 + cleaner 4 + frequency 5 + smell 5 + debris 5 + habits 5。type は 0）<br><br>
+            ① 質問ごとに <code>round(点数 ÷ 34 × 100)</code> を計算（<b>1問ごとに四捨五入</b>）<br>
+            ② その合計が「汚れスコア」（5〜95 に収める）<br>
+            ③ キレイ度 = 100 − 汚れスコア（表示は 5〜95%）
+        </div>
+
+        <h2>上限ルール（重要）</h2>
+        <table>
+            <tr>
+                <th>条件</th>
+                <th>効果</th>
+            </tr>
+            <tr>
+                <td>4年以上未清掃 or 分解クリーニング未経験</td>
+                <td>汚れスコアを最低45に → <b>キレイ度は最大55%</b></td>
+            </tr>
+            <tr>
+                <td>汚れのサインが2つ（ニオイ★＋カス★の点あり）</td>
+                <td>汚れスコアを最低50に → <b>キレイ度は最大50%</b></td>
+            </tr>
+            <tr>
+                <td>黒いカスが実際に付いている（たまに/よく）</td>
+                <td><b>「とてもキレイな状態です」を表示しない</b>（1段階下げる）</td>
+            </tr>
+        </table>
+        <p class="note">「気にしたことがない」は確認できていないだけなので、汚れのサインには含めない（エアコン診断と同じ考え方）。</p>
+
+        <h2>状態フレーズ（4段階・エアコン診断と共通）</h2>
+        <table>
+            <tr>
+                <th>汚れスコア</th>
+                <th>キレイ度</th>
+                <th>表示</th>
+                <th>色</th>
+            </tr>
+            <tr>
+                <td>60〜</td>
+                <td>〜40%</td>
+                <td>かなり汚れているかも</td>
+                <td>赤</td>
+            </tr>
+            <tr>
+                <td>40〜59</td>
+                <td>41〜60%</td>
+                <td>汚れがたまり始めています</td>
+                <td>橙</td>
+            </tr>
+            <tr>
+                <td>20〜39</td>
+                <td>61〜80%</td>
+                <td>おおむね良好な状態です</td>
+                <td>緑</td>
+            </tr>
+            <tr>
+                <td>〜19</td>
+                <td>81%〜</td>
+                <td>とてもキレイな状態です</td>
+                <td>青</td>
+            </tr>
+        </table>
+
+        <h2>分解クリーニングをおすすめする条件</h2>
+        <div class="box">
+            次のいずれかに当てはまったら「分解クリーニングをおすすめ」：<br>
+            ・4年以上未清掃 or 未経験（<code>isLongNeglect</code>）<br>
+            ・黒いカスが付いている（<code>hasDirtSign</code>）<br>
+            ・ニオイがはっきり出ている（<code>isStrongSmell</code>）<br>
+            ・汚れスコア 50以上
+        </div>
+
+        <h2>計算例（ブラウザで検算済み）</h2>
+        <table>
+            <tr>
+                <th>パターン</th>
+                <th>回答</th>
+                <th>キレイ度</th>
+            </tr>
+            <tr>
+                <td>全部ベスト</td>
+                <td>2年未満/1年未満/月1/週1回/気にならない/付かない/フタ開け</td>
+                <td><b>95%</b></td>
+            </tr>
+            <tr>
+                <td>きれいめ</td>
+                <td>2年未満/1〜3年/月1/2〜3日に1回/気にならない/付かない/フタ開け</td>
+                <td><b>88%</b></td>
+            </tr>
+            <tr>
+                <td>ごく一般的な家庭</td>
+                <td>未経験/4〜6年/数ヶ月に1回/1日1回/たまに気になる/気にしたことがない/フタ閉め</td>
+                <td><b>34%</b></td>
+            </tr>
+            <tr>
+                <td>全部ワースト</td>
+                <td>未経験/7年以上/使わない/1日2回/いつも/よく付く/閉め＆残り湯</td>
+                <td><b>5%</b></td>
+            </tr>
+        </table>
+        <p class="note">方針はエアコン診断と同じ：一般的な家庭ほど「汚れ寄り」に出す。ただし本当にキレイな人の85〜95%は崩さない（診断の信用を守るため）。</p>
+
+        <h2>料金表示（結果画面）</h2>
+        <table>
+            <tr>
+                <th>タイプ</th>
+                <th>表示する料金</th>
+            </tr>
+            <tr>
+                <td>縦型</td>
+                <td>縦型 16,000円 のみ</td>
+            </tr>
+            <tr>
+                <td>ドラム式</td>
+                <td>ドラム式 28,000円 のみ</td>
+            </tr>
+            <tr>
+                <td>わからない</td>
+                <td>両方表示</td>
+            </tr>
+        </table>
+        <p class="note">※乾燥機能付き・一部メーカーの追加料金は注記のみ（乾燥機能付き +2,000 / HITACHI +2,000 / 白い約束 +3,000 / ビートウォッシュ +4,000）。<br>
+            結果画面のCTAはLINE直行（見積もりアプリは現状エアコン専用のため）。</p>
+    </div>
+</body>
+
+</html>

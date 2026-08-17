@@ -700,6 +700,10 @@
                 <button class="btn btn-ghost hidden" id="btn-back" style="flex:0 0 90px">戻る</button>
                 <button class="btn btn-primary" id="btn-next" disabled>オプションを選ぶ</button>
             </div>
+            <!-- 診断ページから来た場合だけ表示する -->
+            <p class="back-shindan hidden" id="bar-back-shindan-wrap" style="margin-top:8px">
+                <a href="#" id="bar-btn-back-shindan">← 診断結果に戻る</a>
+            </p>
         </div>
     </div>
 
@@ -813,6 +817,9 @@
             // restore=1 を付けると、診断ページが直前の結果をそのまま出し直してくれる
             // （ブラウザの「戻る」だと、端末によっては最初からやり直しになってしまうため）
             $('btn-back-shindan').href = PRICING.shindanUrl + '?restore=1';
+            // 下部固定バーにも同じ戻るリンクを出す（どのステップからでも診断結果へ戻れるように）
+            $('bar-back-shindan-wrap').classList.remove('hidden');
+            $('bar-btn-back-shindan').href = PRICING.shindanUrl + '?restore=1';
 
             var banner = $('shindan-banner');
             banner.classList.remove('hidden');

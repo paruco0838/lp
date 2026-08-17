@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キレイ度診断 | カジラク</title>
-    <meta name="description" content="質問に答えるだけで、あなたの家のエアコン・洗濯機の「お掃除おすすめ度」をチェック！状態に合わせたおすすめのお手入れ方法もご紹介する無料診断です。">
+    <title>洗濯機キレイ度診断 | カジラク</title>
+    <meta name="description" content="質問に答えるだけで、あなたの家の洗濯機（洗濯槽）の「お掃除おすすめ度」をチェック！状態に合わせたおすすめのお手入れ方法もご紹介する無料診断です。">
     <style>
         :root {
             --navy: #102840;
@@ -114,45 +114,58 @@
             transition: width .35s ease;
         }
 
-        /* スタート画面 */
-        .start-emoji {
-            font-size: 44px;
-            text-align: center;
-        }
-
-        /* スタート画面のエアコンイラスト */
+        /* スタート画面の洗濯機イラスト */
         .start-illust {
             display: block;
-            width: 190px;
-            max-width: 78%;
+            width: 150px;
+            max-width: 62%;
             height: auto;
             margin: 2px auto 6px;
         }
 
-        /* 吹き出す風を、奥から手前へ流れるように動かす */
-        .ac-wind {
-            animation: acWind 2.6s ease-in-out infinite;
+        /* ドラムの中の水面をゆらす */
+        .wm-water {
+            animation: wmWater 3s ease-in-out infinite;
         }
 
-        .ac-wind-2 {
-            animation-delay: .5s;
-        }
-
-        .ac-wind-3 {
-            animation-delay: 1s;
-        }
-
-        @keyframes acWind {
+        @keyframes wmWater {
 
             0%,
             100% {
-                opacity: .25;
-                transform: translate(0, 0);
+                transform: translateX(0);
             }
 
-            45% {
+            50% {
+                transform: translateX(-4px);
+            }
+        }
+
+        /* 泡がふわっと浮かんで消える */
+        .wm-bubble {
+            animation: wmBubble 3s ease-in infinite;
+        }
+
+        .wm-bubble-2 {
+            animation-delay: 1s;
+        }
+
+        .wm-bubble-3 {
+            animation-delay: 2s;
+        }
+
+        @keyframes wmBubble {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+
+            30% {
                 opacity: 1;
-                transform: translate(3px, 5px);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-14px);
             }
         }
 
@@ -182,7 +195,8 @@
         /* 動きを減らす設定の方には静止して見せる */
         @media (prefers-reduced-motion: reduce) {
 
-            .ac-wind,
+            .wm-water,
+            .wm-bubble,
             .ac-sparkle {
                 animation: none;
             }
@@ -417,14 +431,6 @@
             padding: 0 2px;
         }
 
-        .score-msg .msg-level .lv.mid {
-            color: var(--orange);
-        }
-
-        .score-msg .msg-level .lv.low {
-            color: var(--blue);
-        }
-
         .warn-box {
             display: flex;
             gap: 10px;
@@ -545,12 +551,44 @@
             left: 0;
         }
 
-        .family-box {
+        /* 料金の目安 */
+        .price-box {
             background: var(--sky);
             border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 13px;
+            padding: 14px 16px;
             margin-top: 12px;
+        }
+
+        .price-box .pb-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--blue);
+            margin-bottom: 4px;
+        }
+
+        .pb-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .pb-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .pb-row b {
+            color: var(--orange);
+            font-size: 16px;
+        }
+
+        .pb-note {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 6px;
         }
 
         /* 比較セクション */
@@ -701,32 +739,6 @@
             color: var(--navy);
         }
 
-        .btn-red {
-            display: block;
-            width: 100%;
-            background: linear-gradient(135deg, var(--blue), #1f78b8);
-            color: #fff;
-            font-size: 16.5px;
-            font-weight: 900;
-            text-decoration: none;
-            border-radius: 999px;
-            padding: 16px 12px;
-            box-shadow: 0 6px 16px rgba(45, 143, 213, .4);
-            transition: opacity .15s;
-            margin-top: 14px;
-        }
-
-        .btn-red:hover {
-            opacity: .88;
-        }
-
-        /* CTA内のLINEボタン（見積もりボタンの下に置く2番目のボタン） */
-        .cta-line {
-            margin-top: 10px;
-            border-radius: 999px;
-            font-size: 15px;
-        }
-
         .cta-sub {
             font-size: 11.5px;
             color: var(--muted);
@@ -759,9 +771,14 @@
             background: var(--line-dark);
         }
 
+        .cta-line {
+            margin-top: 14px;
+            border-radius: 999px;
+        }
+
         .restart-btn {
             display: inline-block;
-            margin-top: 4px;
+            margin-top: 14px;
             background: none;
             border: 2px solid var(--border);
             border-radius: 999px;
@@ -783,66 +800,6 @@
             color: var(--muted);
             text-align: center;
             margin-top: 20px;
-        }
-
-        /* 診断の種類選択（エアコン／洗濯機） */
-        .cat-list {
-            display: grid;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .cat-btn {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 100%;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            font-size: 17px;
-            font-weight: 900;
-            color: var(--navy);
-            cursor: pointer;
-            text-decoration: none;
-            font-family: inherit;
-            text-align: left;
-            transition: border-color .15s, background .15s, transform .1s;
-        }
-
-        /* マウス操作のときだけ色を変える（スマホはタップ後も色が残ってしまうため） */
-        @media (hover: hover) {
-            .cat-btn:hover {
-                border-color: var(--blue);
-                background: var(--sky);
-            }
-        }
-
-        .cat-btn:active {
-            transform: scale(.98);
-        }
-
-        .cat-icon {
-            font-size: 30px;
-        }
-
-        .cat-label {
-            flex: 1;
-            line-height: 1.4;
-        }
-
-        .cat-sub {
-            display: block;
-            font-size: 12px;
-            color: var(--muted);
-            font-weight: 700;
-        }
-
-        .cat-arrow {
-            color: var(--blue);
-            font-size: 22px;
-            font-weight: 900;
         }
 
         .hidden {
@@ -871,8 +828,8 @@
     <div class="wrap">
         <header class="site-header">
             <span class="area-badge">📍 大阪・兵庫エリア対応 / 出張費無料</span>
-            <h1 id="pageTitle">キレイ度診断</h1>
-            <p class="lead">カジラク | ハウスクリーニング</p>
+            <h1>洗濯機キレイ度診断</h1>
+            <p class="lead">カジラク | 洗濯機クリーニング</p>
         </header>
 
         <!-- プログレス -->
@@ -883,77 +840,59 @@
             </div>
         </div>
 
-        <!-- 診断の種類を選ぶ画面 -->
-        <div class="card" id="categoryCard">
-            <p class="start-title">どちらのキレイ度を<br>診断しますか？</p>
-            <p class="start-text" style="text-align:center;">気になるほうを選んでスタート！<br>どちらも約1分・個人情報の入力は不要です。</p>
-            <div class="cat-list">
-                <button class="cat-btn" id="catAirconBtn" type="button">
-                    <span class="cat-icon">❄️</span>
-                    <span class="cat-label">エアコン<span class="cat-sub">内部のカビ・ホコリをチェック</span></span>
-                    <span class="cat-arrow">›</span>
-                </button>
-                <a class="cat-btn" href="sentaku-shindan.html">
-                    <span class="cat-icon">🧺</span>
-                    <span class="cat-label">洗濯機<span class="cat-sub">洗濯槽のカビ・黒いカスをチェック</span></span>
-                    <span class="cat-arrow">›</span>
-                </a>
-            </div>
-        </div>
-
         <!-- スタート画面 -->
-        <div class="card hidden" id="startCard">
-            <svg class="start-illust" viewBox="0 0 200 140" role="img" aria-labelledby="illustTitle">
-                <title id="illustTitle">きれいな風を送り出すエアコンのイラスト</title>
+        <div class="card" id="startCard">
+            <svg class="start-illust" viewBox="0 0 160 150" role="img" aria-labelledby="illustTitle">
+                <title id="illustTitle">泡でキレイに洗い上がる洗濯機のイラスト</title>
 
                 <!-- 床にうっすら落ちる影 -->
-                <ellipse cx="100" cy="128" rx="58" ry="7" fill="var(--sky)" />
+                <ellipse cx="80" cy="140" rx="52" ry="6" fill="var(--sky)" />
 
                 <!-- 本体 -->
-                <rect x="24" y="24" width="152" height="46" rx="12" fill="#fff" stroke="var(--navy)"
+                <rect x="28" y="12" width="104" height="124" rx="12" fill="#fff" stroke="var(--navy)"
                     stroke-width="3.5" />
-                <!-- 前面パネルの合わせ目 -->
-                <path d="M27 45 H173" stroke="var(--navy)" stroke-width="2" opacity=".2" stroke-linecap="round" />
-                <!-- 吹き出し口 -->
-                <rect x="38" y="53" width="124" height="11" rx="5.5" fill="var(--sky)" stroke="var(--navy)"
-                    stroke-width="2.5" />
-                <!-- 運転ランプ -->
-                <circle cx="158" cy="36" r="3.5" fill="var(--blue)" />
+                <!-- 操作パネルの合わせ目 -->
+                <path d="M31 36 H129" stroke="var(--navy)" stroke-width="2" opacity=".2" stroke-linecap="round" />
+                <!-- 電源ランプと洗剤投入口 -->
+                <circle cx="42" cy="24" r="3.5" fill="var(--blue)" />
+                <rect x="98" y="20" width="22" height="8" rx="4" fill="var(--sky)" stroke="var(--navy)"
+                    stroke-width="2" />
 
-                <!-- 吹き出す風 -->
-                <g fill="none" stroke="var(--blue)" stroke-width="4.5" stroke-linecap="round">
-                    <path class="ac-wind" d="M66 82 q16 15 34 8" />
-                    <path class="ac-wind ac-wind-2" d="M54 99 q19 17 40 9" />
-                    <path class="ac-wind ac-wind-3" d="M74 114 q16 13 34 6" />
+                <!-- ドア（のぞき窓） -->
+                <circle cx="80" cy="86" r="32" fill="var(--sky)" stroke="var(--navy)" stroke-width="3.5" />
+                <circle cx="80" cy="86" r="22" fill="#fff" stroke="var(--blue)" stroke-width="2.5" />
+                <!-- 水面 -->
+                <path class="wm-water" d="M62 92 q6 -6 12 0 t12 0 t12 0" fill="none" stroke="var(--blue)"
+                    stroke-width="3" stroke-linecap="round" />
+                <!-- 泡 -->
+                <g fill="none" stroke="var(--blue)" stroke-width="2">
+                    <circle class="wm-bubble" cx="72" cy="80" r="3.5" />
+                    <circle class="wm-bubble wm-bubble-2" cx="84" cy="84" r="2.5" />
+                    <circle class="wm-bubble wm-bubble-3" cx="90" cy="78" r="3" />
                 </g>
 
-                <!-- キラッと光るきれいさの表現
-                     （位置は g で指定し、拡大縮小だけを path 側で動かす） -->
+                <!-- キラッと光るきれいさの表現 -->
                 <g fill="var(--orange)">
-                    <g transform="translate(150 92)">
+                    <g transform="translate(140 60)">
                         <path class="ac-sparkle" d="M0 -8 Q1.4 -1.4 8 0 Q1.4 1.4 0 8 Q-1.4 1.4 -8 0 Q-1.4 -1.4 0 -8 Z" />
                     </g>
-                    <g transform="translate(170 110)">
-                        <path class="ac-sparkle ac-sparkle-2"
-                            d="M0 -5 Q.9 -.9 5 0 Q.9 .9 0 5 Q-.9 .9 -5 0 Q-.9 -.9 0 -5 Z" />
-                    </g>
-                    <g transform="translate(38 88)">
+                    <g transform="translate(18 90)">
                         <path class="ac-sparkle ac-sparkle-2"
                             d="M0 -5.5 Q1 -1 5.5 0 Q1 1 0 5.5 Q-1 1 -5.5 0 Q-1 -1 0 -5.5 Z" />
                     </g>
                 </g>
             </svg>
-            <p class="start-title">あなたの家のエアコン、<br>内部のキレイ度は何%？</p>
-            <p class="start-text">エアコンの使用状況に関するかんたんな質問にお答えいただくだけで、内部の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
+            <p class="start-title">あなたの家の洗濯機、<br>洗濯槽のキレイ度は何%？</p>
+            <p class="start-text">洗濯機の使用状況に関するかんたんな質問にお答えいただくだけで、洗濯槽の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は最大8問・約1分で完了</li>
+                <li>質問は8問・約1分で完了</li>
                 <li>診断結果に合わせたおすすめのお手入れ方法をご紹介</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
             <div class="cta-area">
                 <button class="btn-line" id="startBtn" type="button">早速診断スタート 👇</button>
             </div>
-            <button class="back-link" id="toCategoryBtn" type="button">← 診断の選択に戻る</button>
+            <a class="back-link" href="shindan.html">← エアコンの診断はこちら</a>
         </div>
 
         <!-- 質問カード -->
@@ -976,7 +915,7 @@
             <div class="card">
                 <div class="score-flex">
                     <div class="ring-block">
-                        <p class="ring-label">あなたのエアコン<br>キレイ度</p>
+                        <p class="ring-label">あなたの洗濯槽<br>キレイ度</p>
                         <div class="ring-wrap">
                             <div class="ring-fill" id="ringFill"></div>
                             <div class="ring-hole"></div>
@@ -986,7 +925,7 @@
                         </div>
                     </div>
                     <div class="score-msg">
-                        <p class="msg-label" id="msgLabel">あなたのエアコンは…</p>
+                        <p class="msg-label" id="msgLabel">あなたの洗濯機は…</p>
                         <p class="msg-level" id="msgLevel"></p>
                         <div class="warn-box" id="warnBox">
                             <span class="warn-icon" id="warnIcon">⚠️</span>
@@ -1008,36 +947,43 @@
                 <p class="rec-title" id="recTitle"></p>
                 <p class="rec-lead" id="recLead"></p>
                 <div class="rec-reasons hidden" id="recReasons"></div>
-                <div class="family-box hidden" id="familyBox"></div>
+                <div class="price-box" id="priceBox">
+                    <p class="pb-title">分解クリーニング料金の目安（税込）</p>
+                    <div class="pb-row" id="rowTate"><span>縦型洗濯機</span><b>16,000円</b></div>
+                    <div class="pb-row" id="rowDrum"><span>ドラム式洗濯機</span><b>28,000円</b></div>
+                    <p class="pb-note">※乾燥機能付きや一部メーカーの機種は追加料金をいただく場合があります。詳しくはLINEでお気軽にご相談ください。</p>
+                </div>
             </div>
 
-            <!-- 通常 vs 完全分解 -->
+            <!-- 市販クリーナー vs 分解クリーニング -->
             <div class="card">
-                <p class="vs-heading">通常クリーニングと完全分解クリーニングの違い</p>
+                <p class="vs-heading">市販クリーナーとプロの分解クリーニングの違い</p>
                 <div class="vs-grid">
                     <div class="vs-card">
-                        <span class="vs-tag">通常クリーニング</span>
+                        <span class="vs-tag">市販の洗濯槽クリーナー</span>
                         <ul>
-                            <li>送風ファンやドレンパンを外さずに洗浄</li>
-                            <li>一般的な汚れに対応</li>
-                            <li>比較的短時間で完了</li>
+                            <li>手軽にできて予防に効果的</li>
+                            <li>表面の汚れや除菌に対応</li>
+                            <li>月1回の使用がおすすめ</li>
                         </ul>
+                        <p class="vs-desc">日常のお手入れとしては優秀ですが、槽の裏側にこびりついたカビまでは落としきれないことがあります。</p>
                     </div>
                     <div class="vs-card full">
-                        <span class="vs-tag">完全分解クリーニング</span>
+                        <span class="vs-tag">プロの分解クリーニング</span>
                         <ul>
-                            <li>送風ファンやドレンパンも外して洗浄</li>
-                            <li>通常では洗いにくい場所まで洗浄</li>
-                            <li>ニオイや奥の汚れに効果的</li>
+                            <li>洗濯槽を取り外して裏側まで洗浄</li>
+                            <li>こびりついたカビ・石けんカスを除去</li>
+                            <li>ニオイ・黒いカスの根本対策に</li>
                         </ul>
+                        <p class="vs-desc">洗濯機を分解し、ふだん見えない洗濯槽の裏側まで徹底的に洗浄する方法です。</p>
                     </div>
                 </div>
-                <p class="vs-note">※機種や設置状況により、完全分解ができない場合があります。</p>
+                <p class="vs-note">※機種や設置状況により、分解できない場合があります。</p>
             </div>
 
             <!-- カジラクの安心 -->
             <div class="card trust-card">
-                <p class="trust-title">カジラクは、完全分解クリーニングにも対応しています！</p>
+                <p class="trust-title">カジラクは、洗濯機の分解クリーニングにも対応しています！</p>
                 <div class="trust-grid">
                     <div class="trust-item">
                         <div class="t-icon">💬</div>
@@ -1059,11 +1005,12 @@
 
             <!-- CTA -->
             <div class="card cta-card">
-                <p class="cta-title">この診断結果をもとに、料金を確認してみましょう！</p>
-                <a class="btn-red" id="mitumoriBtn" href="mitumori.html">かんたん見積もりで料金を見る ›</a>
+                <p class="cta-title">洗濯槽の状態が気になったら、お気軽にご相談ください！</p>
                 <a class="btn-line cta-line" href="https://lin.ee/SBZtDhQ" target="_blank" rel="noopener">LINEで相談・予約する</a>
                 <p class="cta-sub">🔒 無理な営業は一切いたしませんので、ご安心ください。</p>
                 <button class="restart-btn" id="restartBtn" type="button">もう一度診断する</button>
+                <br>
+                <a class="back-link" href="shindan.html">← エアコンの診断もしてみる</a>
             </div>
         </div>
 
@@ -1071,14 +1018,20 @@
     </div>
 
     <script>
-        // 見積もりアプリのURL（同じ場所に置く場合はこのままでOK）
-        const MITUMORI_URL = 'mitumori.html';
-
         // ===== 質問の定義（各選択肢に汚れ点数 pts を持つ加点方式） =====
         const QUESTIONS = {
+            type: {
+                title: 'お使いの洗濯機のタイプはどちらですか？',
+                note: '※料金のご案内に使用します（点数には影響しません）',
+                choices: [
+                    { label: '縦型洗濯機', value: 'tate', pts: 0 },
+                    { label: 'ドラム式洗濯機', value: 'drum', pts: 0 },
+                    { label: 'わからない', value: 'unknown', pts: 0 },
+                ],
+            },
             timing: {
-                title: '前回エアコンクリーニングをしたのはいつ頃ですか？',
-                note: '※プロ業者によるクリーニングのみ。セルフクリーニングは除きます',
+                title: '前回、洗濯機の分解クリーニングをしたのはいつ頃ですか？',
+                note: '※プロ業者による分解洗浄のみ。市販の洗濯槽クリーナーは除きます',
                 choices: [
                     { label: '2年未満', value: 'u2', pts: 0 },
                     { label: '2〜4年以内', value: 'y24', pts: 3 },
@@ -1086,17 +1039,8 @@
                     { label: 'したことがない', value: 'never', pts: 5 },
                 ],
             },
-            lastType: {
-                title: '前回のクリーニングは、通常分解・完全分解のどちらでしたか？',
-                note: '※ほとんどの方が通常分解の洗浄です。完全分解はごく少数の方が選んでいます',
-                choices: [
-                    { label: '完全分解', value: 'full', pts: 0 },
-                    { label: '通常分解', value: 'normal', pts: 2 },
-                    { label: 'わからない', value: 'unknown', pts: 2 },
-                ],
-            },
             years: {
-                title: 'エアコンの使用年数はどれくらいですか？',
+                title: '洗濯機の使用年数はどれくらいですか？',
                 note: '',
                 choices: [
                     { label: '1年未満', value: 'u1', pts: 0 },
@@ -1105,54 +1049,53 @@
                     { label: '7年以上', value: 'o7', pts: 5 },
                 ],
             },
-            frequency: {
-                title: 'エアコンを使用する頻度はどれくらいですか？',
+            cleaner: {
+                title: '市販の洗濯槽クリーナーはどれくらい使っていますか？',
                 note: '',
                 choices: [
-                    // 冷房は結露でカビが発生しやすいため、夏のみは冬のみより高い配点にしている
-                    { label: '夏のみ使用する', value: 'summer', pts: 3 },
-                    { label: '冬のみ使用する', value: 'winter', pts: 1 },
-                    { label: '夏と冬に使用する', value: 'both', pts: 4 },
-                    { label: 'ほぼ1年中使用する', value: 'all', pts: 5 },
+                    { label: '月1回くらい使っている', value: 'monthly', pts: 0 },
+                    { label: '数ヶ月に1回使っている', value: 'sometimes', pts: 2 },
+                    { label: 'ほとんど使わない', value: 'rarely', pts: 4 },
+                ],
+            },
+            frequency: {
+                title: '洗濯の頻度はどれくらいですか？',
+                note: '',
+                choices: [
+                    { label: '1日に2回以上', value: 'twice', pts: 5 },
+                    { label: '1日に1回', value: 'daily', pts: 3 },
+                    { label: '2〜3日に1回', value: 'few', pts: 2 },
+                    { label: '週1回程度', value: 'weekly', pts: 1 },
                 ],
             },
             smell: {
-                title: 'エアコンをつけたときのニオイはいかがですか？',
-                note: '',
+                title: '洗濯物や洗濯槽のニオイは気になりますか？',
+                note: '※生乾き臭・カビ臭など',
                 choices: [
                     { label: '気にならない', value: 'none', pts: 0 },
-                    { label: 'しばらくすると気になる', value: 'later', pts: 3 },
-                    { label: 'すぐ臭う', value: 'soon', pts: 4 },
-                    { label: '常に臭う', value: 'always', pts: 5 },
+                    { label: 'たまに気になる', value: 'sometimes', pts: 3 },
+                    { label: 'よく気になる', value: 'often', pts: 4 },
+                    { label: 'いつも気になる', value: 'always', pts: 5 },
                 ],
             },
-            dust: {
-                title: '吹き出し口や送風の汚れ・黒いカスは気になりますか？',
+            debris: {
+                title: '洗濯物に黒いカス・ワカメのような汚れが付くことはありますか？',
                 note: '',
                 choices: [
-                    { label: '見たことがない', value: 'never_checked', pts: 2 },
-                    { label: '黒い点は見えない', value: 'none', pts: 0 },
-                    { label: '黒い点が見える', value: 'spots', pts: 3 },
-                    { label: '黒いカスが出ることがある', value: 'debris', pts: 5 },
+                    { label: '気にしたことがない', value: 'never_checked', pts: 2 },
+                    { label: '付かない', value: 'none', pts: 0 },
+                    { label: 'たまに付く', value: 'sometimes', pts: 3 },
+                    { label: 'よく付く', value: 'often', pts: 5 },
                 ],
             },
-            family: {
-                title: 'ご家庭に小さなお子様やペットはいらっしゃいますか？',
-                note: '',
+            habits: {
+                title: 'ふだんの使い方で、あてはまるものはどれですか？',
+                note: '※フタの閉めっぱなしと残り湯洗濯は、洗濯槽にカビが育ちやすくなります',
                 choices: [
-                    { label: '子供のみいる', value: 'child', pts: 0 },
-                    { label: 'ペットのみ飼っている', value: 'pet', pts: 3 },
-                    { label: '両方いる', value: 'both', pts: 3 },
-                    { label: 'どちらもいない', value: 'none', pts: 0 },
-                ],
-            },
-            efficiency: {
-                title: 'エアコンの効き方について、変化はありますか？',
-                note: '',
-                choices: [
-                    { label: '変わらない', value: 'same', pts: 0 },
-                    { label: '少し弱い気がする', value: 'slight', pts: 3 },
-                    { label: '明らかに悪い', value: 'bad', pts: 5 },
+                    { label: 'フタは開けて乾かす・残り湯は使わない', value: 'best', pts: 0 },
+                    { label: 'フタは閉めっぱなしにしがち', value: 'lid', pts: 3 },
+                    { label: 'お風呂の残り湯を使っている', value: 'bathwater', pts: 3 },
+                    { label: 'フタ閉めっぱなし＆残り湯も使う', value: 'both', pts: 5 },
                 ],
             },
         };
@@ -1160,50 +1103,47 @@
         // ===== 「気になったポイント」の文言（回答ごと） =====
         const CONCERNS = {
             timing: {
-                y24: { title: '前回のクリーニングから2〜4年経過', desc: '内部に汚れがたまり始めている時期です。' },
-                o4: { title: '4年以上クリーニングしていない', desc: '長期間お掃除していないため、内部にカビやホコリがかなり蓄積している可能性が高い状態です。' },
-                never: { title: 'クリーニングを一度もしたことがない', desc: '使用開始からの汚れがそのまま内部に蓄積しています。早めのクリーニングを強くおすすめします。' },
-            },
-            lastType: {
-                normal: { title: '前回は通常分解クリーニング', desc: '奥やドレンパン部分に洗い残しが残っている場合があります。' },
-                unknown: { title: '前回の洗浄タイプが不明', desc: '通常分解の場合、奥に洗い残しが残っている可能性があります。' },
+                y24: { title: '前回の分解クリーニングから2〜4年経過', desc: '洗濯槽の裏側に汚れがたまり始めている時期です。' },
+                o4: { title: '4年以上分解クリーニングしていない', desc: '長期間お掃除していないため、槽の裏側にカビや石けんカスがかなり蓄積している可能性が高い状態です。' },
+                never: { title: '分解クリーニングを一度もしたことがない', desc: '使用開始からの汚れが槽の裏側にそのまま蓄積しています。早めのクリーニングを強くおすすめします。' },
             },
             years: {
-                y13: { title: '使用年数が1〜3年', desc: '内部に汚れがたまり始める時期です。' },
-                y46: { title: '使用年数が4〜6年', desc: 'ホコリやカビがたまりやすくなる時期です。' },
-                o7: { title: '使用年数が7年以上', desc: '長年の使用で内部の汚れが蓄積しやすい状態です。' },
+                y13: { title: '使用年数が1〜3年', desc: '槽の裏側に汚れがたまり始める時期です。' },
+                y46: { title: '使用年数が4〜6年', desc: 'カビや石けんカスがたまりやすくなる時期です。' },
+                o7: { title: '使用年数が7年以上', desc: '長年の使用で槽の裏側の汚れが蓄積しやすい状態です。' },
+            },
+            cleaner: {
+                sometimes: { title: '洗濯槽クリーナーの使用が数ヶ月に1回', desc: 'お手入れの間隔が空くと、カビが根付きやすくなります。' },
+                rarely: { title: '洗濯槽クリーナーをほとんど使っていない', desc: '洗濯槽の裏側は、お手入れをしないとカビや石けんカスがたまり続けます。' },
             },
             frequency: {
-                summer: { title: '夏の冷房で使用している', desc: '冷房を使うとエアコン内部に結露が発生し、カビが繁殖しやすくなります。' },
-                winter: { title: '冬の暖房で使用している', desc: '稼働中に吸い込んだホコリが内部にたまっていきます。' },
-                both: { title: '夏と冬に使用している', desc: '稼働期間が長いうえ、冷房時の結露もあり、ホコリやカビがたまりやすくなります。' },
-                all: { title: 'ほぼ1年中使用している', desc: '稼働時間が長く、内部にホコリやカビがたまりやすい状態です。' },
+                twice: { title: '1日に2回以上お洗濯している', desc: '使用回数が多いぶん、石けんカスや湿気で汚れがたまりやすくなります。' },
+                daily: { title: '毎日お洗濯している', desc: '使用のたびに石けんカスや湿気がたまり、カビが育ちやすい環境になります。' },
+                few: { title: '2〜3日に1回お洗濯している', desc: '標準的な頻度ですが、少しずつ汚れは蓄積していきます。' },
+                weekly: { title: '週1回程度お洗濯している', desc: '使用回数は少なめですが、槽内の湿気には注意が必要です。' },
             },
             smell: {
-                later: { title: 'つけ始めのニオイが気になる', desc: '内部でカビが発生し始めているサインかもしれません。' },
-                soon: { title: 'ニオイがかなり気になる', desc: '内部の汚れが原因でニオイが発生している可能性があります。' },
-                always: { title: 'ニオイが常に気になる', desc: '内部でカビが広がっている可能性が高い状態です。' },
+                sometimes: { title: 'ニオイがたまに気になる', desc: '洗濯槽の裏側でカビが発生し始めているサインかもしれません。' },
+                often: { title: 'ニオイがよく気になる', desc: '槽の裏側の汚れが原因でニオイが発生している可能性があります。' },
+                always: { title: 'ニオイがいつも気になる', desc: '洗濯槽の裏側でカビが広がっている可能性が高い状態です。' },
             },
-            dust: {
-                never_checked: { title: '内部の汚れを確認したことがない', desc: '見えない部分にホコリやカビがたまっている可能性があります。' },
-                spots: { title: '吹き出し口に黒い汚れが見える', desc: 'カビやホコリが内部にたまっているサインかもしれません。' },
-                debris: { title: '黒いカスが出ることがある', desc: '内部のカビ・汚れがはがれて出てきている状態です。' },
+            debris: {
+                never_checked: { title: '洗濯槽の汚れを気にしたことがない', desc: '見えない槽の裏側にカビがたまっている可能性があります。' },
+                sometimes: { title: '黒いカスがたまに付く', desc: '槽の裏側のカビ（ピロピロわかめ）がはがれて出てきているサインです。' },
+                often: { title: '黒いカスがよく付く', desc: '槽の裏側のカビがかなり広がっている状態です。洗い上がりの衛生面にも影響します。' },
             },
-            family: {
-                pet: { title: 'ペットがいるご家庭', desc: '毛やホコリでエアコン内部が汚れやすくなります。' },
-                both: { title: 'お子様とペットがいるご家庭', desc: '毛やホコリで汚れやすく、空気の質にも気を配りたい環境です。' },
-            },
-            efficiency: {
-                slight: { title: '効きがやや弱くなっている', desc: '内部の汚れが効きに影響し始めているサインかもしれません。' },
-                bad: { title: '効きが明らかに悪くなっている', desc: '内部や室外機の汚れが原因のことがあります。電気代にも影響します。' },
+            habits: {
+                lid: { title: 'フタを閉めっぱなしにしがち', desc: '槽内に湿気がこもり、カビが育ちやすくなります。' },
+                bathwater: { title: 'お風呂の残り湯を使っている', desc: '残り湯の雑菌や皮脂が槽内に残り、カビの栄養になります。' },
+                both: { title: 'フタ閉めっぱなし＆残り湯洗濯', desc: '湿気と雑菌の両方がそろい、カビが特に育ちやすい環境です。' },
             },
         };
 
-        // 質問を出す順番（lastTypeはクリーニング経験者のみ）
-        const ORDER = ['timing', 'lastType', 'years', 'frequency', 'smell', 'dust', 'family', 'efficiency'];
+        // 質問を出す順番
+        const ORDER = ['type', 'timing', 'years', 'cleaner', 'frequency', 'smell', 'debris', 'habits'];
 
-        // 汚れ点数の最大値（timing5 + lastType2 + years5 + frequency5 + smell5 + dust5 + family3 + efficiency5）
-        const MAX_PTS = 35;
+        // 汚れ点数の最大値（timing5 + years5 + cleaner4 + frequency5 + smell5 + debris5 + habits5。typeは0）
+        const MAX_PTS = 34;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1211,27 +1151,16 @@
 
         const $ = (id) => document.getElementById(id);
 
-        // lastTypeは直近4年以内にクリーニングした人のみ質問する（4年以上前・未経験は洗浄タイプを聞く意味が薄いため）
-        function shouldAsk(key) {
-            if (key === 'lastType') {
-                return answers.timing && (answers.timing.value === 'u2' || answers.timing.value === 'y24');
-            }
-            return true;
-        }
-
         function nextQuestion() {
             for (const key of ORDER) {
-                if (!shouldAsk(key)) continue;
                 if (!answers[key]) return key;
             }
             return null; // 全問終了
         }
 
-        // 全体の質問数（分岐で変わる）
+        // 全体の質問数（分岐なしの固定8問）
         function totalQuestions() {
-            const t = answers.timing;
-            if (t && (t.value === 'u2' || t.value === 'y24')) return 8;
-            return 7;
+            return ORDER.length;
         }
 
         // 質問ごとのおすすめ度への加算（%）
@@ -1239,7 +1168,7 @@
             return Math.round((answers[key].pts / MAX_PTS) * 100);
         }
 
-        // 4年以上クリーニングしていない／一度もしたことがない人かどうか
+        // 4年以上分解クリーニングしていない／一度もしたことがない人かどうか
         function isLongNeglect() {
             return answers.timing && (answers.timing.value === 'o4' || answers.timing.value === 'never');
         }
@@ -1251,18 +1180,16 @@
                 if (answers[key]) total += deductionOf(key);
             }
             let score = Math.max(5, Math.min(95, total));
-            // 4年以上お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
+            // 4年以上お掃除していない場合、自覚症状が少なくても槽の裏側には汚れが蓄積しているため下限を設ける
             if (isLongNeglect()) score = Math.max(score, 45);
-            // ニオイ・黒い汚れ・効きの低下が複数出ている場合、
-            // 使用年数などが浅くても内部に汚れがたまっているため、キレイ度に上限を設ける
-            // （点数は8問の平均なので、2〜3問だけでは下がりきらない。症状の数に応じて段階的に押さえる）
+            // ニオイ・黒いカスの両方が出ている場合、
+            // 使用年数などが浅くても槽の裏側に汚れがたまっているため、キレイ度に上限を設ける
             const symp = symptomCount();
-            if (symp >= 3) score = Math.max(score, 62);      // キレイ度 38%以下
-            else if (symp >= 2) score = Math.max(score, 50); // キレイ度 50%以下
+            if (symp >= 2) score = Math.max(score, 50); // キレイ度 50%以下
             return score;
         }
 
-        // 4段階の状態フレーズと色（結果の見せ方の一覧表と同じ色に固定。連続計算式だと基準値を調整するたびに色がズレるため）
+        // 4段階の状態フレーズと色（エアコン診断と同じ基準に固定）
         const LEVELS = [
             { min: 60, text: 'かなり汚れているかも', hue: 5 },
             { min: 40, text: '汚れがたまり始めています', hue: 40 },
@@ -1271,9 +1198,7 @@
         ];
 
         // 状態フレーズと色を決める。
-        // 黒い点やカスが実際に見えている人は、合計点が低くても「とてもキレイ」とは表示しない。
-        // （点数は8問の平均なので1問だけでは下がりきらず、
-        //   「とてもキレイ」＋「完全分解をおすすめ」という矛盾が出てしまうため）
+        // 黒いカスが実際に付いている人は、合計点が低くても「とてもキレイ」とは表示しない。
         function levelInfo(score) {
             const info = LEVELS.find((lv) => score >= lv.min) || LEVELS[LEVELS.length - 1];
             if (hasDirtSign() && info.min === 0) {
@@ -1282,17 +1207,15 @@
             return info;
         }
 
-        // 汚れスコアに応じた状態フレーズ（キレイ度80%以上を「とてもキレイ」の基準とし、各段階を10%ずつ引き上げ）
         function levelOf(score) {
             return levelInfo(score).text;
         }
 
-        // 汚れスコアに応じた色（段階ごとに固定：かなり汚れている=赤／汚れ始め=橙／おおむね良好=緑／とてもキレイ=青）
         function colorOf(score) {
             return `hsl(${levelInfo(score).hue}, 78%, 44%)`;
         }
 
-        // キレイ度に応じたリングのグラデーション（段階の色を基準に、同じ色相内で濃淡をつけた光沢表現）
+        // キレイ度に応じたリングのグラデーション
         function buildRingGradient(cleanScore, hue) {
             const mid = (cleanScore / 2).toFixed(1);
             const end = cleanScore.toFixed(1);
@@ -1320,62 +1243,52 @@
             return items;
         }
 
-        // ===== 症状の数（ニオイ・カス・効き） =====
-        // 「黒い点が見える」「黒いカスが出る」＝実際に目で見えた汚れのサイン。
-        // 「見たことがない」は"確認できていない"だけで汚れのサインではないため含めない。
+        // ===== 汚れのサイン（ニオイ・黒いカス） =====
+        // 「たまに付く」「よく付く」＝実際に目で見えた汚れのサイン。
+        // 「気にしたことがない」は"確認できていない"だけでサインには含めない。
         function hasDirtSign() {
-            if (!answers.dust) return false;
-            return answers.dust.value === 'spots' || answers.dust.value === 'debris';
+            if (!answers.debris) return false;
+            return answers.debris.value === 'sometimes' || answers.debris.value === 'often';
         }
 
-        // 「すぐ臭う」「常に臭う」＝ニオイがはっきり出ている状態。
+        // 「よく気になる」「いつも気になる」＝ニオイがはっきり出ている状態。
         // 判定は点数ではなく選んだ選択肢そのもので見る（配点を変えても条件がズレないようにするため）
         function isStrongSmell() {
             if (!answers.smell) return false;
-            return answers.smell.value === 'soon' || answers.smell.value === 'always';
+            return answers.smell.value === 'often' || answers.smell.value === 'always';
         }
 
         function symptomCount() {
             let n = 0;
             if (answers.smell && answers.smell.pts > 0) n++;
             if (hasDirtSign()) n++;
-            if (answers.efficiency && answers.efficiency.pts > 0) n++;
             return n;
         }
 
-        // ===== 完全分解をおすすめする条件と理由 =====
+        // ===== 分解クリーニングをおすすめする条件と理由 =====
         function fullReasons() {
             const reasons = [];
-            if (answers.dust) {
-                if (answers.dust.value === 'debris') reasons.push('黒いカスが出ることがある');
-                else if (answers.dust.value === 'spots') reasons.push('黒い汚れがはっきり見える');
-                else if (answers.dust.value === 'never_checked') reasons.push('内部の汚れを目視で確認できていない');
+            if (answers.debris) {
+                if (answers.debris.value === 'often') reasons.push('黒いカス・ワカメ状の汚れがよく付く');
+                else if (answers.debris.value === 'sometimes') reasons.push('黒いカスが付くことがある');
+                else if (answers.debris.value === 'never_checked') reasons.push('洗濯槽の裏側の汚れを確認できていない');
             }
-            if (isStrongSmell()) reasons.push('ニオイがかなり気になる');
-            else if (answers.smell && answers.smell.value === 'later') reasons.push('つけ始めのニオイが気になる');
+            if (isStrongSmell()) reasons.push('生乾き臭・カビ臭がはっきり出ている');
+            else if (answers.smell && answers.smell.value === 'sometimes') reasons.push('ニオイが気になることがある');
             if (answers.timing) {
-                if (answers.timing.value === 'o4') reasons.push('4年以上クリーニングしていない');
-                if (answers.timing.value === 'never') reasons.push('クリーニングを一度もしたことがない');
+                if (answers.timing.value === 'o4') reasons.push('4年以上分解クリーニングしていない');
+                if (answers.timing.value === 'never') reasons.push('分解クリーニングを一度もしたことがない');
             }
-            if (answers.lastType && answers.lastType.value !== 'full') reasons.push('前回は奥まで洗わない通常分解だった');
+            if (answers.cleaner && answers.cleaner.value === 'rarely') reasons.push('洗濯槽クリーナーをほとんど使っていない');
+            if (answers.habits && answers.habits.value !== 'best') reasons.push('カビが育ちやすい使い方になっている');
             return reasons;
         }
 
-        // ===== お子様・ペットの声かけコメント =====
-        function familyText() {
-            const fam = answers.family ? answers.family.value : 'none';
-            const hasChild = fam === 'child' || fam === 'both';
-            const hasPet = fam === 'pet' || fam === 'both';
-            if (hasChild && hasPet) {
-                return '🧒🐾 お子様やペットは長時間エアコンの空気を吸い続けるため、空気の質が特に大切です。ご家族とペットのために、定期的なクリーニングをおすすめします。';
-            }
-            if (hasChild) {
-                return '🧒 お子様は免疫力が低く、汚れた空気を吸い続けると喘息やアレルギー症状を引き起こす可能性があります。お子様の健康のために、定期的なクリーニングをおすすめします。';
-            }
-            if (hasPet) {
-                return '🐾 ペットを飼っているとエアコンが汚れやすく、ペットも長時間エアコンの空気を吸い続けます。ペットとご自身のために、定期的なクリーニングをおすすめします。';
-            }
-            return '';
+        // 洗濯機タイプに合わせて料金表示を切り替える
+        function updatePriceBox() {
+            const t = answers.type ? answers.type.value : 'unknown';
+            $('rowTate').classList.toggle('hidden', t === 'drum');
+            $('rowDrum').classList.toggle('hidden', t === 'tate');
         }
 
         function showQuestion(key) {
@@ -1432,7 +1345,7 @@
 
         function showResult() {
             const score = calcRecScore();          // 汚れスコア（内部判定用。高いほど汚れている）
-            const cleanScore = Math.max(5, Math.min(95, 100 - score)); // キレイ度（表示用。低いほど汚れている＝悪い）
+            const cleanScore = Math.max(5, Math.min(95, 100 - score)); // キレイ度（表示用）
             const level = levelOf(score);
             const color = colorOf(score);
             const concerns = buildConcerns();
@@ -1446,7 +1359,7 @@
             area.classList.remove('hidden');
             area.classList.add('fade-in');
 
-            // リングゲージ（4段階のラベルと同じ色に固定。低い=赤 → 高いほど青に近づく）
+            // リングゲージ
             const ringFill = $('ringFill');
             const ringCenter = $('ringCenter');
             ringCenter.style.color = color;
@@ -1463,7 +1376,7 @@
                 if (cur >= cleanScore) clearInterval(timer);
             }, 25);
 
-            // 状態フレーズ（スコアと同じ色で表示）
+            // 状態フレーズ
             $('msgLevel').innerHTML = `<span class="lv" style="color:${color}">${level}</span>！`;
 
             // 状況メッセージ
@@ -1472,15 +1385,15 @@
             let warnIcon = '⚠️';
             let warnOk = false;
             if (isLongNeglect() && sympN >= 1) {
-                warnText = '長期間クリーニングをしていないうえ、ニオイや汚れのサインも見られました。エアコン内部にカビやホコリがかなりたまっている可能性が高い状態です。';
+                warnText = '長期間分解クリーニングをしていないうえ、ニオイや黒いカスのサインも見られました。洗濯槽の裏側にカビがかなりたまっている可能性が高い状態です。';
             } else if (isLongNeglect()) {
-                warnText = '目立った症状はまだ出ていませんが、4年以上クリーニングしていないエアコンの内部には、見えないカビやホコリが蓄積しているケースがほとんどです。';
+                warnText = '目立った症状はまだ出ていませんが、4年以上分解クリーニングしていない洗濯槽の裏側には、見えないカビや石けんカスが蓄積しているケースがほとんどです。';
             } else if (sympN >= 2) {
-                warnText = 'ニオイや汚れのサインが複数見られました。エアコン内部に汚れがたまっている可能性が高そうです。';
+                warnText = 'ニオイや黒いカスのサインが複数見られました。洗濯槽の裏側に汚れがたまっている可能性が高そうです。';
             } else if (sympN === 1) {
-                warnText = '汚れのサインが見られました。内部に汚れがたまり始めているかもしれません。';
+                warnText = '汚れのサインが見られました。槽の裏側に汚れがたまり始めているかもしれません。';
             } else if (score >= 40) {
-                warnText = '目立った症状はまだ出ていませんが、期間的に内部へ汚れがたまっている可能性があります。';
+                warnText = '目立った症状はまだ出ていませんが、期間的に槽の裏側へ汚れがたまっている可能性があります。';
             } else {
                 warnText = '大きな汚れのサインは見つかりませんでした。良い状態をキープできています✨';
                 warnIcon = '🌿';
@@ -1509,43 +1422,29 @@
 
             // あなたの場合（おすすめ）
             const reasons = fullReasons();
-            const recommendFull = isLongNeglect() || hasDirtSign() || isStrongSmell() || score >= 50 || (answers.lastType && answers.lastType.value !== 'full' && score >= 20);
+            const recommendFull = isLongNeglect() || hasDirtSign() || isStrongSmell() || score >= 50;
             const recReasons = $('recReasons');
             if (recommendFull) {
-                $('recTitle').innerHTML = '<span class="accent">完全分解クリーニング</span>を<br>おすすめします！';
-                $('recLead').textContent = '通常のクリーニングでは落としきれない、奥の汚れやカビまでしっかり洗浄できます。';
+                $('recTitle').innerHTML = '<span class="accent">洗濯槽の分解クリーニング</span>を<br>おすすめします！';
+                $('recLead').textContent = '市販のクリーナーでは落としきれない、洗濯槽の裏側のカビや石けんカスまでしっかり洗浄できます。';
                 if (reasons.length) {
                     recReasons.classList.remove('hidden');
-                    recReasons.innerHTML = '<p class="rr-title">完全分解がおすすめの理由</p>' + reasons.map((r) => `<li>${r}</li>`).join('');
+                    recReasons.innerHTML = '<p class="rr-title">分解クリーニングがおすすめの理由</p>' + reasons.map((r) => `<li>${r}</li>`).join('');
                 } else {
                     recReasons.classList.add('hidden');
                 }
             } else if (score >= 20) {
-                $('recTitle').innerHTML = 'そろそろ<span class="accent">クリーニング</span>の<br>検討がおすすめです';
-                $('recLead').textContent = '大きな症状が出る前のクリーニングが、費用も時間も一番おトクです。まずはスタンダード洗浄からでも十分効果が見込めます。';
+                $('recTitle').innerHTML = 'そろそろ<span class="accent">分解クリーニング</span>の<br>検討がおすすめです';
+                $('recLead').textContent = '黒いカスやニオイが出る前のクリーニングが、費用も手間も一番おトクです。月1回の洗濯槽クリーナーとあわせて検討してみてください。';
                 recReasons.classList.add('hidden');
             } else {
                 $('recTitle').innerHTML = '今すぐのクリーニングは<br><span class="accent">必須ではなさそう</span>です';
-                $('recLead').textContent = '良い状態をキープするために、2年に1度を目安にした定期的な分解洗浄がおすすめです。';
+                $('recLead').textContent = '良い状態をキープするために、月1回の洗濯槽クリーナーと、2〜3年に1度を目安にした分解クリーニングがおすすめです。';
                 recReasons.classList.add('hidden');
             }
 
-            // 見積もりアプリへ診断結果を引き継ぐ（キレイ度とおすすめ内容）
-            const recKey = recommendFull ? 'full' : (score >= 20 ? 'soon' : 'none');
-            $('mitumoriBtn').href = `${MITUMORI_URL}?clean=${cleanScore}&rec=${recKey}`;
-
-            // お子様・ペット
-            const fam = familyText();
-            const famBox = $('familyBox');
-            if (fam) {
-                famBox.textContent = fam;
-                famBox.classList.remove('hidden');
-            } else {
-                famBox.classList.add('hidden');
-            }
-
-            // 見積もりページから戻ってきたときに、この結果をそのまま復元できるようにしておく
-            saveAnswers();
+            // 料金の目安をタイプに合わせて表示
+            updatePriceBox();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1553,7 +1452,7 @@
         function goBack() {
             const lastKey = history.pop();
             if (lastKey === undefined) return;
-            // 戻る質問以降の回答をすべて消す（分岐のズレを防ぐ）
+            // 戻る質問以降の回答をすべて消す（ズレを防ぐ）
             const idx = ORDER.indexOf(lastKey);
             ORDER.slice(idx).forEach((k) => delete answers[k]);
             showQuestion(lastKey);
@@ -1570,69 +1469,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        /* ===== 見積もりページから戻ってきたときの結果の復元 =====
-         * 見積もりページの「診断結果に戻る」から ?restore=1 付きで開かれた場合に、
-         * 直前の診断結果をそのまま復元する（もう一度answering し直さなくて済むように）。
-         * 保存先は sessionStorage なので、タブを閉じれば自動的に消える。
-         * 通常どおり開いたときは復元しないので、いつもの流れは変わらない。
-         */
-        const SAVE_KEY = 'kajiraku_shindan_answers';
-
-        function saveAnswers() {
-            try {
-                sessionStorage.setItem(SAVE_KEY, JSON.stringify(answers));
-            } catch (e) {
-                // プライベートモードなどで保存できない場合は、復元をあきらめるだけ
-            }
-        }
-
-        function restoreIfRequested() {
-            if (new URLSearchParams(window.location.search).get('restore') !== '1') return false;
-            let saved;
-            try {
-                saved = JSON.parse(sessionStorage.getItem(SAVE_KEY) || 'null');
-            } catch (e) {
-                return false;
-            }
-            if (!saved) return false;
-
-            // 全問そろっている場合だけ復元する（途中までの回答では結果を出せないため）
-            // shouldAsk は answers を見て分岐を判断するので、先に入れてから確認する
-            answers = saved;
-            if (!ORDER.every((k) => !shouldAsk(k) || answers[k])) {
-                answers = {};
-                return false;
-            }
-
-            $('startCard').classList.add('hidden');
-            $('categoryCard').classList.add('hidden');
-            $('pageTitle').textContent = 'エアコンキレイ度診断';
-            $('progressArea').style.display = 'block';
-            showResult();
-            return true;
-        }
-
-        /* ===== 診断の種類選択（エアコン／洗濯機） =====
-         * エアコンを選ぶとこのページの診断がそのまま始まる。
-         * 洗濯機は sentaku-shindan.html へ移動する（ボタン自体がリンク）。
-         */
-        $('catAirconBtn').addEventListener('click', () => {
-            $('categoryCard').classList.add('hidden');
-            $('startCard').classList.remove('hidden');
-            $('pageTitle').textContent = 'エアコンキレイ度診断';
-        });
-
-        $('toCategoryBtn').addEventListener('click', () => {
-            $('startCard').classList.add('hidden');
-            $('categoryCard').classList.remove('hidden');
-            $('pageTitle').textContent = 'キレイ度診断';
-        });
-
         $('startBtn').addEventListener('click', advance);
         $('backBtn').addEventListener('click', goBack);
         $('restartBtn').addEventListener('click', restart);
-
-        restoreIfRequested();
     </script>
 </body>
 
