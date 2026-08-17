@@ -123,7 +123,8 @@
             詳細: <code>tasks/lessons.md</code>
         </div>
 
-        <h2>質問と配点（全9問・分岐なし）</h2>
+        <h2>質問と配点（全9問・洗濯機タイプで1問だけ分岐）</h2>
+        <p class="note">質問8は分岐する：<b>縦型 → 黒いカス（debris）／ドラム式 → 乾燥機能（drying）</b>。どちらも満点5点なので、タイプによる点数の有利不利はない。</p>
         <table>
             <tr>
                 <th>キー</th>
@@ -243,7 +244,7 @@
             </tr>
             <tr>
                 <td rowspan="4"><code>debris</code></td>
-                <td rowspan="4">黒いカス・ワカメ状の汚れ</td>
+                <td rowspan="4">黒いカス・ワカメ状の汚れ<br><small>※縦型のみ</small></td>
                 <td>気にしたことがない</td>
                 <td class="pts">2</td>
             </tr>
@@ -258,6 +259,24 @@
             <tr>
                 <td>よく付く ★</td>
                 <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td rowspan="4"><code>drying</code></td>
+                <td rowspan="4">乾燥機能の効き<br><small>※ドラム式のみ（2026-08-17追加）</small></td>
+                <td>変わらず、しっかり乾く</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>以前より乾きが悪い気がする</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>明らかに乾かない・生乾きになる ★</td>
+                <td class="pts">5</td>
+            </tr>
+            <tr>
+                <td>乾燥機能はほとんど使わない</td>
+                <td class="pts">0</td>
             </tr>
             <tr>
                 <td rowspan="4"><code>habits</code></td>
@@ -278,11 +297,11 @@
                 <td class="pts">5</td>
             </tr>
         </table>
-        <p class="note">★＝「汚れのサイン」に使う選択肢（ニオイ=よく/いつも、カス=たまに/よく）。判定は点数ではなく value で行う。</p>
+        <p class="note">★＝「汚れのサイン」に使う選択肢（ニオイ=よく/いつも、カス=たまに/よく、乾燥=明らかに乾かない）。判定は点数ではなく value で行う。</p>
 
         <h2>計算式</h2>
         <div class="box">
-            <b>満点（MAX_PTS）= 38点</b>（timing 6 + years 5 + cleaner 4 + detergent 3 + frequency 5 + smell 5 + debris 5 + habits 5。type は 0）<br><br>
+            <b>満点（MAX_PTS）= 38点</b>（timing 6 + years 5 + cleaner 4 + detergent 3 + frequency 5 + smell 5 + debris/dryingどちらか 5 + habits 5。type は 0）<br><br>
             ① 質問ごとに <code>round(点数 ÷ 38 × 100)</code> を計算（<b>1問ごとに四捨五入</b>）<br>
             ② その合計が「汚れスコア」（5〜95 に収める）<br>
             ③ キレイ度 = 100 − 汚れスコア（表示は 5〜95%）
@@ -299,11 +318,11 @@
                 <td>汚れスコアを最低45に → <b>キレイ度は最大55%</b></td>
             </tr>
             <tr>
-                <td>汚れのサインが2つ（ニオイ★＋カス★の点あり）</td>
+                <td>汚れのサインが2つ（ニオイ・カス・乾燥低下のうち2つに点あり）</td>
                 <td>汚れスコアを最低50に → <b>キレイ度は最大50%</b></td>
             </tr>
             <tr>
-                <td>黒いカスが実際に付いている（たまに/よく）</td>
+                <td>黒いカスが実際に付いている（たまに/よく）<br>または 乾燥機能が明らかに低下（ドラム式）</td>
                 <td><b>「とてもキレイな状態です」を表示しない</b>（1段階下げる）</td>
             </tr>
         </table>
@@ -349,6 +368,7 @@
             ・4年以上未清掃 or 未経験（<code>isLongNeglect</code>）<br>
             ・黒いカスが付いている（<code>hasDirtSign</code>）<br>
             ・ニオイがはっきり出ている（<code>isStrongSmell</code>）<br>
+            ・乾燥機能が明らかに低下（<code>isDryingBad</code>・ドラム式のみ）<br>
             ・汚れスコア 50以上
         </div>
 
@@ -378,6 +398,11 @@
                 <td>一般的な家庭＋無添加洗剤</td>
                 <td>上と同じで洗剤だけ無添加系</td>
                 <td><b>31%</b></td>
+            </tr>
+            <tr>
+                <td>ドラム式の一般的な家庭</td>
+                <td>未経験/4〜6年/数ヶ月に1回/一般洗剤/1日1回/たまに気になる/乾きが悪い気がする/フタ閉め</td>
+                <td><b>36%</b></td>
             </tr>
             <tr>
                 <td>全部ワースト</td>

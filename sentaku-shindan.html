@@ -1087,6 +1087,7 @@
                 ],
             },
             debris: {
+                // 縦型の人だけに出す質問（ドラム式は代わりに drying を出す）
                 title: '洗濯物に黒いカス・ワカメのような汚れが付くことはありますか？',
                 note: '',
                 choices: [
@@ -1094,6 +1095,17 @@
                     { label: '付かない', value: 'none', pts: 0 },
                     { label: 'たまに付く', value: 'sometimes', pts: 3 },
                     { label: 'よく付く', value: 'often', pts: 5 },
+                ],
+            },
+            drying: {
+                // ドラム式の人だけに出す質問（内部のホコリ詰まりは乾燥の効きに一番先に出るため）
+                title: '乾燥機能の効き具合はいかがですか？',
+                note: '※ドラム式は内部にホコリがたまると乾燥の効きが落ちやすくなります',
+                choices: [
+                    { label: '変わらず、しっかり乾く', value: 'none', pts: 0 },
+                    { label: '以前より乾きが悪い気がする', value: 'slight', pts: 3 },
+                    { label: '明らかに乾かない・生乾きになる', value: 'bad', pts: 5 },
+                    { label: '乾燥機能はほとんど使わない', value: 'unused', pts: 0 },
                 ],
             },
             habits: {
@@ -1143,6 +1155,10 @@
                 sometimes: { title: '黒いカスがたまに付く', desc: '槽の裏側のカビ（ピロピロわかめ）がはがれて出てきているサインです。' },
                 often: { title: '黒いカスがよく付く', desc: '槽の裏側のカビがかなり広がっている状態です。洗い上がりの衛生面にも影響します。' },
             },
+            drying: {
+                slight: { title: '乾燥の効きがやや落ちている', desc: '内部のホコリ詰まりで乾燥効率が下がり始めているサインかもしれません。' },
+                bad: { title: '乾燥機能が明らかに落ちている', desc: '内部やヒーター周りにホコリが詰まっている可能性が高い状態です。電気代にも影響します。' },
+            },
             habits: {
                 lid: { title: 'フタを閉めっぱなしにしがち', desc: '槽内に湿気がこもり、カビが育ちやすくなります。' },
                 bathwater: { title: 'お風呂の残り湯を使っている', desc: '残り湯の雑菌や皮脂が槽内に残り、カビの栄養になります。' },
@@ -1150,10 +1166,10 @@
             },
         };
 
-        // 質問を出す順番
-        const ORDER = ['type', 'timing', 'years', 'cleaner', 'detergent', 'frequency', 'smell', 'debris', 'habits'];
+        // 質問を出す順番（debrisは縦型のみ・dryingはドラム式のみ。どちらか片方だけ出るので常に9問）
+        const ORDER = ['type', 'timing', 'years', 'cleaner', 'detergent', 'frequency', 'smell', 'debris', 'drying', 'habits'];
 
-        // 汚れ点数の最大値（timing6 + years5 + cleaner4 + detergent3 + frequency5 + smell5 + debris5 + habits5。typeは0）
+        // 汚れ点数の最大値（timing6 + years5 + cleaner4 + detergent3 + frequency5 + smell5 + debris/dryingどちらか5 + habits5。typeは0）
         const MAX_PTS = 38;
 
         // ===== 状態管理 =====
@@ -1162,16 +1178,25 @@
 
         const $ = (id) => document.getElementById(id);
 
+        // 黒いカスの質問は縦型のみ・乾燥機能の質問はドラム式のみ出す
+        function shouldAsk(key) {
+            const isDrum = answers.type && answers.type.value === 'drum';
+            if (key === 'debris') return !isDrum;
+            if (key === 'drying') return isDrum;
+            return true;
+        }
+
         function nextQuestion() {
             for (const key of ORDER) {
+                if (!shouldAsk(key)) continue;
                 if (!answers[key]) return key;
             }
             return null; // 全問終了
         }
 
-        // 全体の質問数（分岐なしの固定8問）
+        // 全体の質問数（debris/dryingはどちらか片方だけ出るので常に9問になる）
         function totalQuestions() {
-            return ORDER.length;
+            return ORDER.filter(shouldAsk).length;
         }
 
         // 質問ごとのおすすめ度への加算（%）
@@ -1212,7 +1237,7 @@
         // 黒いカスが実際に付いている人は、合計点が低くても「とてもキレイ」とは表示しない。
         function levelInfo(score) {
             const info = LEVELS.find((lv) => score >= lv.min) || LEVELS[LEVELS.length - 1];
-            if (hasDirtSign() && info.min === 0) {
+            if ((hasDirtSign() || isDryingBad()) && info.min === 0) {
                 return LEVELS.find((lv) => lv.min === 20);
             }
             return info;
@@ -1269,10 +1294,17 @@
             return answers.smell.value === 'often' || answers.smell.value === 'always';
         }
 
+        // 「明らかに乾かない」＝ドラム式の内部詰まりがはっきり出ているサイン（黒いカスと同格に扱う）
+        function isDryingBad() {
+            if (!answers.drying) return false;
+            return answers.drying.value === 'bad';
+        }
+
         function symptomCount() {
             let n = 0;
             if (answers.smell && answers.smell.pts > 0) n++;
             if (hasDirtSign()) n++;
+            if (answers.drying && answers.drying.pts > 0) n++; // ドラム式の乾燥低下もサインに数える
             return n;
         }
 
@@ -1283,6 +1315,10 @@
                 if (answers.debris.value === 'often') reasons.push('黒いカス・ワカメ状の汚れがよく付く');
                 else if (answers.debris.value === 'sometimes') reasons.push('黒いカスが付くことがある');
                 else if (answers.debris.value === 'never_checked') reasons.push('洗濯槽の裏側の汚れを確認できていない');
+            }
+            if (answers.drying) {
+                if (answers.drying.value === 'bad') reasons.push('乾燥機能が明らかに落ちている');
+                else if (answers.drying.value === 'slight') reasons.push('乾燥の効きが落ちてきている');
             }
             if (isStrongSmell()) reasons.push('生乾き臭・カビ臭がはっきり出ている');
             else if (answers.smell && answers.smell.value === 'sometimes') reasons.push('ニオイが気になることがある');
@@ -1397,11 +1433,11 @@
             let warnIcon = '⚠️';
             let warnOk = false;
             if (isLongNeglect() && sympN >= 1) {
-                warnText = '長期間分解クリーニングをしていないうえ、ニオイや黒いカスのサインも見られました。洗濯槽の裏側にカビがかなりたまっている可能性が高い状態です。';
+                warnText = '長期間分解クリーニングをしていないうえ、ニオイなどの汚れのサインも見られました。洗濯槽の裏側にカビがかなりたまっている可能性が高い状態です。';
             } else if (isLongNeglect()) {
                 warnText = '目立った症状はまだ出ていませんが、4年以上分解クリーニングしていない洗濯槽の裏側には、見えないカビや石けんカスが蓄積しているケースがほとんどです。';
             } else if (sympN >= 2) {
-                warnText = 'ニオイや黒いカスのサインが複数見られました。洗濯槽の裏側に汚れがたまっている可能性が高そうです。';
+                warnText = 'ニオイなどの汚れのサインが複数見られました。洗濯槽の裏側に汚れがたまっている可能性が高そうです。';
             } else if (sympN === 1) {
                 warnText = '汚れのサインが見られました。槽の裏側に汚れがたまり始めているかもしれません。';
             } else if (score >= 40) {
@@ -1434,7 +1470,7 @@
 
             // あなたの場合（おすすめ）
             const reasons = fullReasons();
-            const recommendFull = isLongNeglect() || hasDirtSign() || isStrongSmell() || score >= 50;
+            const recommendFull = isLongNeglect() || hasDirtSign() || isStrongSmell() || isDryingBad() || score >= 50;
             const recReasons = $('recReasons');
             if (recommendFull) {
                 $('recTitle').innerHTML = '<span class="accent">洗濯槽の分解クリーニング</span>を<br>おすすめします！';
