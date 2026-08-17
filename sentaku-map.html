@@ -123,7 +123,7 @@
             詳細: <code>tasks/lessons.md</code>
         </div>
 
-        <h2>質問と配点（全8問・分岐なし）</h2>
+        <h2>質問と配点（全9問・分岐なし）</h2>
         <table>
             <tr>
                 <th>キー</th>
@@ -157,11 +157,11 @@
             </tr>
             <tr>
                 <td>4年以上</td>
-                <td class="pts">5</td>
+                <td class="pts">6</td>
             </tr>
             <tr>
                 <td>したことがない</td>
-                <td class="pts">5</td>
+                <td class="pts">6</td>
             </tr>
             <tr>
                 <td rowspan="4"><code>years</code></td>
@@ -194,6 +194,20 @@
             <tr>
                 <td>ほとんど使わない</td>
                 <td class="pts">4</td>
+            </tr>
+            <tr>
+                <td rowspan="3"><code>detergent</code></td>
+                <td rowspan="3">洗濯洗剤のタイプ<br><small>※2026-08-17追加</small></td>
+                <td>一般的な洗剤（液体・粉末・ジェルボール）</td>
+                <td class="pts">0</td>
+            </tr>
+            <tr>
+                <td>無添加・せっけん系の洗剤</td>
+                <td class="pts">3</td>
+            </tr>
+            <tr>
+                <td>わからない</td>
+                <td class="pts">0</td>
             </tr>
             <tr>
                 <td rowspan="4"><code>frequency</code></td>
@@ -272,8 +286,8 @@
 
         <h2>計算式</h2>
         <div class="box">
-            <b>満点（MAX_PTS）= 34点</b>（timing 5 + years 5 + cleaner 4 + frequency 5 + smell 5 + debris 5 + habits 5。type は 0）<br><br>
-            ① 質問ごとに <code>round(点数 ÷ 34 × 100)</code> を計算（<b>1問ごとに四捨五入</b>）<br>
+            <b>満点（MAX_PTS）= 38点</b>（timing 6 + years 5 + cleaner 4 + detergent 3 + frequency 5 + smell 5 + debris 5 + habits 5。type は 0）<br><br>
+            ① 質問ごとに <code>round(点数 ÷ 38 × 100)</code> を計算（<b>1問ごとに四捨五入</b>）<br>
             ② その合計が「汚れスコア」（5〜95 に収める）<br>
             ③ キレイ度 = 100 − 汚れスコア（表示は 5〜95%）
         </div>
@@ -351,22 +365,27 @@
             </tr>
             <tr>
                 <td>全部ベスト</td>
-                <td>2年未満/1年未満/月1/週1回/気にならない/付かない/フタ開け</td>
+                <td>2年未満/1年未満/月1/一般洗剤/週1回/気にならない/付かない/フタ開け</td>
                 <td><b>95%</b></td>
             </tr>
             <tr>
                 <td>きれいめ</td>
-                <td>2年未満/1〜3年/月1/2〜3日に1回/気にならない/付かない/フタ開け</td>
-                <td><b>88%</b></td>
+                <td>2年未満/1〜3年/月1/一般洗剤/2〜3日に1回/気にならない/付かない/フタ開け</td>
+                <td><b>90%</b></td>
             </tr>
             <tr>
                 <td>ごく一般的な家庭</td>
-                <td>未経験/4〜6年/数ヶ月に1回/1日1回/たまに気になる/気にしたことがない/フタ閉め</td>
-                <td><b>34%</b></td>
+                <td>未経験/4〜6年/数ヶ月に1回/一般洗剤/1日1回/たまに気になる/気にしたことがない/フタ閉め</td>
+                <td><b>39%</b></td>
+            </tr>
+            <tr>
+                <td>一般的な家庭＋無添加洗剤</td>
+                <td>上と同じで洗剤だけ無添加系</td>
+                <td><b>31%</b></td>
             </tr>
             <tr>
                 <td>全部ワースト</td>
-                <td>未経験/7年以上/使わない/1日2回/いつも/よく付く/閉め＆残り湯</td>
+                <td>未経験/7年以上/使わない/無添加系/1日2回/いつも/よく付く/閉め＆残り湯</td>
                 <td><b>5%</b></td>
             </tr>
         </table>

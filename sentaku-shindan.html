@@ -885,7 +885,7 @@
             <p class="start-title">あなたの家の洗濯機、<br>洗濯槽のキレイ度は何%？</p>
             <p class="start-text">洗濯機の使用状況に関するかんたんな質問にお答えいただくだけで、洗濯槽の汚れ具合とお掃除のおすすめ度をチェックします✨</p>
             <ul class="start-points">
-                <li>質問は8問・約1分で完了</li>
+                <li>質問は9問・約1分で完了</li>
                 <li>診断結果に合わせたおすすめのお手入れ方法をご紹介</li>
                 <li>個人情報の入力は不要です</li>
             </ul>
@@ -1035,8 +1035,8 @@
                 choices: [
                     { label: '2年未満', value: 'u2', pts: 0 },
                     { label: '2〜4年以内', value: 'y24', pts: 3 },
-                    { label: '4年以上', value: 'o4', pts: 5 },
-                    { label: 'したことがない', value: 'never', pts: 5 },
+                    { label: '4年以上', value: 'o4', pts: 6 },
+                    { label: 'したことがない', value: 'never', pts: 6 },
                 ],
             },
             years: {
@@ -1056,6 +1056,15 @@
                     { label: '月1回くらい使っている', value: 'monthly', pts: 0 },
                     { label: '数ヶ月に1回使っている', value: 'sometimes', pts: 2 },
                     { label: 'ほとんど使わない', value: 'rarely', pts: 4 },
+                ],
+            },
+            detergent: {
+                title: 'ふだんお使いの洗濯洗剤はどのタイプですか？',
+                note: '※無添加・せっけん系は石けんカスが槽に残りやすい性質があります',
+                choices: [
+                    { label: '一般的な洗剤（液体・粉末・ジェルボール）', value: 'normal', pts: 0 },
+                    { label: '無添加・せっけん系の洗剤', value: 'mutenka', pts: 3 },
+                    { label: 'わからない', value: 'unknown', pts: 0 },
                 ],
             },
             frequency: {
@@ -1116,6 +1125,9 @@
                 sometimes: { title: '洗濯槽クリーナーの使用が数ヶ月に1回', desc: 'お手入れの間隔が空くと、カビが根付きやすくなります。' },
                 rarely: { title: '洗濯槽クリーナーをほとんど使っていない', desc: '洗濯槽の裏側は、お手入れをしないとカビや石けんカスがたまり続けます。' },
             },
+            detergent: {
+                mutenka: { title: '無添加・せっけん系の洗剤を使用', desc: '溶け残った石けんカスが槽の裏側に付きやすく、カビの栄養になりやすい洗剤です。' },
+            },
             frequency: {
                 twice: { title: '1日に2回以上お洗濯している', desc: '使用回数が多いぶん、石けんカスや湿気で汚れがたまりやすくなります。' },
                 daily: { title: '毎日お洗濯している', desc: '使用のたびに石けんカスや湿気がたまり、カビが育ちやすい環境になります。' },
@@ -1140,10 +1152,10 @@
         };
 
         // 質問を出す順番
-        const ORDER = ['type', 'timing', 'years', 'cleaner', 'frequency', 'smell', 'debris', 'habits'];
+        const ORDER = ['type', 'timing', 'years', 'cleaner', 'detergent', 'frequency', 'smell', 'debris', 'habits'];
 
-        // 汚れ点数の最大値（timing5 + years5 + cleaner4 + frequency5 + smell5 + debris5 + habits5。typeは0）
-        const MAX_PTS = 34;
+        // 汚れ点数の最大値（timing6 + years5 + cleaner4 + detergent3 + frequency5 + smell5 + debris5 + habits5。typeは0）
+        const MAX_PTS = 38;
 
         // ===== 状態管理 =====
         let answers = {};
@@ -1280,6 +1292,7 @@
                 if (answers.timing.value === 'never') reasons.push('分解クリーニングを一度もしたことがない');
             }
             if (answers.cleaner && answers.cleaner.value === 'rarely') reasons.push('洗濯槽クリーナーをほとんど使っていない');
+            if (answers.detergent && answers.detergent.value === 'mutenka') reasons.push('石けんカスが残りやすい無添加系洗剤を使っている');
             if (answers.habits && answers.habits.value !== 'best') reasons.push('カビが育ちやすい使い方になっている');
             return reasons;
         }
