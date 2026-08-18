@@ -635,6 +635,10 @@
                 <p class="back-shindan hidden" id="back-shindan-wrap">
                     <a href="#" id="btn-back-shindan">← 診断結果に戻る</a>
                 </p>
+                <!-- エアコン見積もりから来た場合だけ表示する -->
+                <p class="back-shindan hidden" id="back-aircon-wrap">
+                    <a href="mitumori.html?restore=1" id="btn-back-aircon">← エアコン見積もりに戻る</a>
+                </p>
             </div>
 
             <p class="disclaimer">
@@ -659,6 +663,10 @@
             <!-- 診断ページから来た場合だけ表示する -->
             <p class="back-shindan hidden" id="bar-back-shindan-wrap" style="margin-top:8px">
                 <a href="#" id="bar-btn-back-shindan">← 診断結果に戻る</a>
+            </p>
+            <!-- エアコン見積もりから来た場合だけ表示する -->
+            <p class="back-shindan hidden" id="bar-back-aircon-wrap" style="margin-top:8px">
+                <a href="mitumori.html?restore=1" id="bar-btn-back-aircon">← エアコン見積もりに戻る</a>
             </p>
         </div>
     </div>
@@ -1157,7 +1165,23 @@
             goStep(1);
         });
 
+        /* ── エアコン見積もりからの行き来 ─────────────────
+         * エアコン見積もりのボタンから ?from=aircon 付きで開いたときだけ、
+         * 「← エアコン見積もりに戻る」リンクを表示する。
+         * リンク先は ?restore=1 付きなので、エアコン見積もり側が
+         * 保存しておいた選択内容をそのまま出し直してくれる。
+         * ───────────────────────────────────────── */
+        function setupBackAircon() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('from') !== 'aircon') return;
+
+            ['back-aircon-wrap', 'bar-back-aircon-wrap'].forEach(function (id) {
+                $(id).classList.remove('hidden');
+            });
+        }
+
         setupShindan();
+        setupBackAircon();
         renderMenus();
         updateBar();
     </script>

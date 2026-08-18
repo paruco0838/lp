@@ -432,6 +432,21 @@
             line-height: 1.7;
             margin-top: 14px;
         }
+
+        /* エアコン見積もりから来た場合だけ出す戻るリンク */
+        .back-aircon {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .back-aircon a {
+            color: var(--muted);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1px;
+        }
     </style>
 </head>
 
@@ -457,8 +472,8 @@
 
                 <!-- 3か所以上でセット料金になるお知らせ（常時表示） -->
                 <div class="note" style="margin-bottom:12px">
-                    <strong>組み合わせでおトクなセット料金！</strong><br>
-                    浴室＋換気扇・キッチン＋換気扇の2点セットから、3点・4点・5点セットまで自動で適用されます。<br>
+                    <strong>セット価格は自動で反映されます！</strong><br>
+                    浴室＋換気扇・キッチン＋換気扇の2点セットから、3点・4点・5点セットまで、対象の組み合わせを選ぶだけでOKです。<br>
                     ※セット料金は広さによって前後するため、事前にお部屋のお写真をLINEでお送りください。
                 </div>
 
@@ -491,6 +506,7 @@
                     <p class="tax">税込</p>
                 </div>
                 <div id="breakdown"></div>
+                <p class="sec-note" style="margin:10px 0 0">※ 水回りのセット価格は自動で反映されています。</p>
             </div>
 
             <div class="card">
@@ -500,6 +516,10 @@
                 <div class="btn-row">
                     <button class="btn btn-ghost" id="btn-restart">やり直す</button>
                 </div>
+                <!-- エアコン見積もりから来た場合だけ表示する -->
+                <p class="back-aircon hidden" id="back-aircon-wrap">
+                    <a href="mitumori.html?restore=1" id="btn-back-aircon">← エアコン見積もりに戻る</a>
+                </p>
             </div>
 
             <p class="disclaimer">
@@ -522,6 +542,10 @@
                 <button class="btn btn-ghost hidden" id="btn-back" style="flex:0 0 90px">戻る</button>
                 <button class="btn btn-primary" id="btn-next" disabled>オプションを選ぶ</button>
             </div>
+            <!-- エアコン見積もりから来た場合だけ表示する -->
+            <p class="back-aircon hidden" id="bar-back-aircon-wrap" style="margin-top:8px">
+                <a href="mitumori.html?restore=1" id="bar-btn-back-aircon">← エアコン見積もりに戻る</a>
+            </p>
         </div>
     </div>
 
@@ -537,10 +561,10 @@
             // 場所ごとの単品料金
             // setKey … セット判定に使う記号（A=浴室 B=換気扇 C=キッチン D=トイレ E=洗面所）
             places: [
-                { id: 'bath', setKey: 'A', name: '浴室クリーニング', price: 15000, hoursText: '目安 2〜3時間' },
-                { id: 'kitchen', setKey: 'C', name: 'キッチンクリーニング', price: 12000, hoursText: '目安 1.5〜2時間' },
-                { id: 'toilet', setKey: 'D', name: 'トイレクリーニング', price: 8000, hoursText: '目安 1〜1.5時間' },
-                { id: 'senmen', setKey: 'E', name: '洗面所クリーニング', price: 8000, hoursText: '目安 1〜1.5時間' }
+                { id: 'bath', setKey: 'A', name: '浴室クリーニング', price: 15000 },
+                { id: 'kitchen', setKey: 'C', name: 'キッチンクリーニング', price: 12000 },
+                { id: 'toilet', setKey: 'D', name: 'トイレクリーニング', price: 8000 },
+                { id: 'senmen', setKey: 'E', name: '洗面所クリーニング', price: 8000 }
             ],
 
             // 換気扇はタイプによって料金が違う（どちらか1つを選ぶ）
@@ -548,8 +572,8 @@
                 setKey: 'B',
                 label: '換気扇クリーニング（タイプを選択）',
                 variants: [
-                    { id: 'prop', name: 'プロペラ型', price: 13000, hoursText: '目安 2〜3時間' },
-                    { id: 'range', name: 'レンジフード型', price: 14000, hoursText: '目安 2〜3時間' }
+                    { id: 'prop', name: 'プロペラ型', price: 13000 },
+                    { id: 'range', name: 'レンジフード型', price: 14000 }
                 ]
             },
 
@@ -558,11 +582,11 @@
             // three は「浴室・換気扇・キッチン」の組み合わせのときだけ適用
             // bathFan は「浴室＋換気扇」、kitchenFan は「キッチン＋換気扇」の2点のときだけ適用
             sets: {
-                five: { name: '水回り5点セット', min: 47000, max: 50000, hoursText: '目安 8〜9時間' },
-                four: { name: '水回り4点セット', min: 42000, max: 44000, hoursText: '目安 6〜7時間' },
-                three: { name: '水回り3点セット（浴室・キッチン・換気扇）', min: 36000, max: 39000, hoursText: '目安 6〜7時間' },
-                bathFan: { name: '浴室換気扇セット', min: 27000, max: null, hoursText: '目安 4〜5時間' },
-                kitchenFan: { name: 'キッチン換気扇セット', min: 25000, max: null, hoursText: '目安 3〜4時間' }
+                five: { name: '水回り5点セット', min: 47000, max: 50000 },
+                four: { name: '水回り4点セット', min: 42000, max: 44000 },
+                three: { name: '水回り3点セット（浴室・キッチン・換気扇）', min: 36000, max: 39000 },
+                bathFan: { name: '浴室換気扇セット', min: 27000, max: null },
+                kitchenFan: { name: 'キッチン換気扇セット', min: 25000, max: null }
             },
 
             // オプション
@@ -718,7 +742,6 @@
             PRICING.places.forEach(function (p, i) {
                 list.appendChild(buildToggleRow({
                     name: p.name,
-                    meta: p.hoursText,
                     price: p.price,
                     on: !!state.sel[p.id],
                     onTap: function () {
@@ -740,7 +763,6 @@
                     PRICING.fan.variants.forEach(function (v) {
                         list.appendChild(buildToggleRow({
                             name: '換気扇（' + v.name + '）',
-                            meta: v.hoursText,
                             price: v.price,
                             on: state.fanType === v.id,
                             onTap: function () {
@@ -766,7 +788,7 @@
                 return;
             }
             banner.classList.remove('hidden');
-            banner.textContent = '🎉 ' + r.set.name + 'が適用されます！ ' + yenText(r.set.min, r.set.max) + '（' + r.set.hoursText + '）';
+            banner.textContent = '🎉 ' + r.set.name + 'の価格が自動で反映されました！ ' + yenText(r.set.min, r.set.max);
         }
 
         function renderOptions() {
@@ -897,6 +919,21 @@
             addRow(bd, '合計（税込）', yenText(r.min, r.max), 'is-total');
         }
 
+        /* ── エアコン見積もりからの行き来 ─────────────────
+         * エアコン見積もりのボタンから ?from=aircon 付きで開いたときだけ、
+         * 「← エアコン見積もりに戻る」リンクを表示する。
+         * リンク先は ?restore=1 付きなので、エアコン見積もり側が
+         * 保存しておいた選択内容をそのまま出し直してくれる。
+         * ───────────────────────────────────────── */
+        function setupBackAircon() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('from') !== 'aircon') return;
+
+            ['back-aircon-wrap', 'bar-back-aircon-wrap'].forEach(function (id) {
+                $(id).classList.remove('hidden');
+            });
+        }
+
         /* ── 起動 ───────────────── */
 
         $('btn-next').addEventListener('click', function () {
@@ -915,6 +952,7 @@
             goStep(1);
         });
 
+        setupBackAircon();
         renderPlaces();
         updateBar();
     </script>

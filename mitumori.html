@@ -685,8 +685,8 @@
             <div class="card">
                 <h2 class="sec-title">洗濯機・水回りもご希望の方はこちら</h2>
                 <p class="sec-note">エアコンと同じ日にまとめてお掃除もできます。お気軽にお見積もりください。</p>
-                <a class="btn btn-ghost" href="sentaku-mitumori.html" style="margin-bottom:8px">🌀 洗濯機クリーニングの見積もりを見る</a>
-                <a class="btn btn-ghost" href="mizumawari-mitumori.html">🛁 水回りクリーニングの見積もりを見る</a>
+                <a class="btn btn-ghost cross-link" href="sentaku-mitumori.html?from=aircon" style="margin-bottom:8px">🌀 洗濯機クリーニングの見積もりを見る</a>
+                <a class="btn btn-ghost cross-link" href="mizumawari-mitumori.html?from=aircon">🛁 水回りクリーニングの見積もりを見る</a>
             </div>
 
             <p class="disclaimer">
@@ -816,7 +816,8 @@
 
         function setupShindan() {
             $('shindan-link').href = PRICING.shindanUrl;
-            state.shindan = readShindanResult();
+            // URLに診断結果がなくても、復元した診断結果があればそれを使う
+            state.shindan = readShindanResult() || state.shindan;
             if (!state.shindan) return;
 
             // 診断から来た人には、診断への誘導リンクは出さず、かわりに戻るリンクを出す
@@ -1241,6 +1242,44 @@
             addRow(bd, '合計（税込）', yen(r.total) + '円', 'is-total');
         }
 
+        /* ── 洗濯機・水回り見積もりとの行き来 ─────────────────
+         * 「洗濯機・水回りもご希望の方はこちら」のボタンを押したときに、
+         * いまの選択内容を保存しておく（sessionStorage。タブを閉じれば消える）。
+         * 向こうのページの「← エアコン見積もりに戻る」は ?restore=1 付きで
+         * このページに戻ってくるので、保存した内容で結果画面を出し直す。
+         * ───────────────────────────────────────── */
+        var STORAGE_KEY = 'aircon-mitumori-state';
+
+        function saveStateForReturn() {
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    menuQty: state.menuQty,
+                    optionQty: state.optionQty,
+                    shindan: state.shindan
+                }));
+            } catch (e) { /* 保存できない端末でもページ移動自体は続ける */ }
+        }
+
+        // ?restore=1 で開かれたら保存した選択内容を読み戻す（成功したら true）
+        function restoreState() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('restore') !== '1') return false;
+
+            var raw = null;
+            try { raw = sessionStorage.getItem(STORAGE_KEY); } catch (e) { }
+            if (!raw) return false;
+
+            try {
+                var saved = JSON.parse(raw);
+                state.menuQty = saved.menuQty || {};
+                state.optionQty = saved.optionQty || {};
+                if (saved.shindan) state.shindan = saved.shindan;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
         /* ── 起動 ───────────────── */
 
         $('btn-next').addEventListener('click', function () {
@@ -1259,9 +1298,19 @@
             goStep(1);
         });
 
+        Array.prototype.forEach.call(document.querySelectorAll('.cross-link'), function (a) {
+            a.addEventListener('click', saveStateForReturn);
+        });
+
+        var restored = restoreState();
         setupShindan();
         renderMenus();
-        updateBar();
+        if (restored && totalUnits() > 0) {
+            // 保存した内容で結果画面をそのまま出し直す
+            goStep(3);
+        } else {
+            updateBar();
+        }
     </script>
 </body>
 
