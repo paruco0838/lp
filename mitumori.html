@@ -668,6 +668,13 @@
                 <div id="breakdown"></div>
             </div>
 
+            <!-- 洗濯機・水回りの見積もりも見た場合だけ表示される合計カード -->
+            <div class="card hidden" id="combined-card">
+                <h2 class="sec-title">ほかの見積もりとあわせた合計</h2>
+                <p class="sec-note">このブラウザで見積もった内容をあわせた金額です。</p>
+                <div id="combined-breakdown"></div>
+            </div>
+
             <div class="card">
                 <h2 class="sec-title">ご相談・ご予約はLINEで</h2>
                 <p class="sec-note">この画面のスクリーンショットを添えてお送りいただくと、やり取りがスムーズです。</p>
@@ -1240,6 +1247,60 @@
             }
 
             addRow(bd, '合計（税込）', yen(r.total) + '円', 'is-total');
+
+            // この見積もりを「合計」用に記憶して、合計カードを更新する
+            saveToCart(r.total, r.total);
+            renderCombinedTotal();
+        }
+
+        /* ── 3つの見積もりの合計 ─────────────────
+         * エアコン・洗濯機・水回りの各見積もりページが、結果画面を出した
+         * タイミングで自分の金額を記憶する（sessionStorage。タブを閉じれば消える）。
+         * 2つ以上たまったら、結果画面に「あわせた合計」カードを表示する。
+         * ───────────────────────────────────────── */
+        var CART_KEY = 'kajiraku-cart';
+        var CART_CATEGORY = 'aircon';
+        var CART_LABELS = { aircon: 'エアコンクリーニング', sentaku: '洗濯機クリーニング', mizumawari: '水回りクリーニング' };
+        var CART_ORDER = ['aircon', 'sentaku', 'mizumawari'];
+
+        function readCart() {
+            try { return JSON.parse(sessionStorage.getItem(CART_KEY)) || {}; }
+            catch (e) { return {}; }
+        }
+
+        // min と max で金額を記憶する（水回りのセット料金は幅があるため。max が null は「〜」＝上限なし）
+        function saveToCart(min, max) {
+            var cart = readCart();
+            if (min > 0) cart[CART_CATEGORY] = { min: min, max: max };
+            else delete cart[CART_CATEGORY];
+            try { sessionStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) { }
+        }
+
+        function cartYen(min, max) {
+            if (max === null) return yen(min) + '円〜';
+            if (min === max) return yen(min) + '円';
+            return yen(min) + '〜' + yen(max) + '円';
+        }
+
+        function renderCombinedTotal() {
+            var cart = readCart();
+            var cats = CART_ORDER.filter(function (c) { return cart[c]; });
+            var card = $('combined-card');
+
+            // 自分の見積もりしかない間は出さない
+            if (cats.length < 2) { card.classList.add('hidden'); return; }
+
+            card.classList.remove('hidden');
+            var bd = $('combined-breakdown');
+            bd.textContent = '';
+
+            var min = 0, max = 0, open = false;
+            cats.forEach(function (c) {
+                min += cart[c].min;
+                if (cart[c].max === null) { open = true; } else { max += cart[c].max; }
+                addRow(bd, CART_LABELS[c], cartYen(cart[c].min, cart[c].max));
+            });
+            addRow(bd, '合計（税込）', cartYen(min, open ? null : max), 'is-total');
         }
 
         /* ── 洗濯機・水回り見積もりとの行き来 ─────────────────
@@ -1293,6 +1354,8 @@
         $('btn-restart').addEventListener('click', function () {
             state.menuQty = {};
             state.optionQty = {};
+            // やり直したら「合計」用の記憶からも消す
+            saveToCart(0, 0);
             renderMenus();
             renderOptions();
             goStep(1);
