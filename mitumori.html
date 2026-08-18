@@ -1366,7 +1366,12 @@
         });
 
         Array.prototype.forEach.call(document.querySelectorAll('.cross-link'), function (a) {
-            a.addEventListener('click', saveStateForReturn);
+            a.addEventListener('click', function () {
+                saveStateForReturn();
+                // 結果画面まで進んでいなくても、いま選んでいる金額を「合計」用に記憶してから移動する
+                var r = calc();
+                saveToCart(r.total, r.total);
+            });
         });
 
         var restored = restoreState();
