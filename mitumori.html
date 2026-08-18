@@ -655,6 +655,14 @@
                 <p class="sec-note">つけなくてもOKです。台数分まで選べます。</p>
                 <div id="option-list"></div>
             </div>
+
+            <!-- 洗濯機・水回りへの取りこぼし防止の案内 -->
+            <div class="card">
+                <h2 class="sec-title">洗濯機・水回りもご希望の方はこちら</h2>
+                <p class="sec-note">エアコンと同じ日にまとめてお掃除もできます。お気軽にお見積もりください。</p>
+                <a class="btn btn-ghost cross-link" href="sentaku-mitumori.html?from=aircon" style="margin-bottom:8px">🌀 洗濯機クリーニングの見積もりを見る</a>
+                <a class="btn btn-ghost cross-link" href="mizumawari-mitumori.html?from=aircon">🛁 水回りクリーニングの見積もりを見る</a>
+            </div>
         </section>
 
         <!-- ── ステップ3：見積もり結果 ───────────────── -->
@@ -686,14 +694,6 @@
                 <p class="back-shindan hidden" id="back-shindan-wrap">
                     <a href="#" id="btn-back-shindan">← 診断結果に戻る</a>
                 </p>
-            </div>
-
-            <!-- 洗濯機・水回りへの取りこぼし防止の案内 -->
-            <div class="card">
-                <h2 class="sec-title">洗濯機・水回りもご希望の方はこちら</h2>
-                <p class="sec-note">エアコンと同じ日にまとめてお掃除もできます。お気軽にお見積もりください。</p>
-                <a class="btn btn-ghost cross-link" href="sentaku-mitumori.html?from=aircon" style="margin-bottom:8px">🌀 洗濯機クリーニングの見積もりを見る</a>
-                <a class="btn btn-ghost cross-link" href="mizumawari-mitumori.html?from=aircon">🛁 水回りクリーニングの見積もりを見る</a>
             </div>
 
             <p class="disclaimer">
@@ -1316,7 +1316,8 @@
                 sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
                     menuQty: state.menuQty,
                     optionQty: state.optionQty,
-                    shindan: state.shindan
+                    shindan: state.shindan,
+                    step: state.step // 戻ってきたとき、飛んだときと同じ画面を出すため
                 }));
             } catch (e) { /* 保存できない端末でもページ移動自体は続ける */ }
         }
@@ -1335,11 +1336,14 @@
                 state.menuQty = saved.menuQty || {};
                 state.optionQty = saved.optionQty || {};
                 if (saved.shindan) state.shindan = saved.shindan;
+                // 飛んだときの画面（2=オプション/3=結果）に戻す。記録がなければ結果画面
+                restoredStep = (saved.step === 2 || saved.step === 3) ? saved.step : 3;
                 return true;
             } catch (e) {
                 return false;
             }
         }
+        var restoredStep = 3;
 
         /* ── 起動 ───────────────── */
 
@@ -1369,8 +1373,8 @@
         setupShindan();
         renderMenus();
         if (restored && totalUnits() > 0) {
-            // 保存した内容で結果画面をそのまま出し直す
-            goStep(3);
+            // 保存した内容で、飛んだときと同じ画面（オプション or 結果）を出し直す
+            goStep(restoredStep);
         } else {
             updateBar();
         }
