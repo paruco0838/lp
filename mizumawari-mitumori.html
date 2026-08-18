@@ -457,8 +457,9 @@
 
                 <!-- 3か所以上でセット料金になるお知らせ（常時表示） -->
                 <div class="note" style="margin-bottom:12px">
-                    <strong>3か所以上でおトクなセット料金！</strong><br>
-                    浴室・キッチン・換気扇の3点セットや、4点・5点セットが自動で適用されます。
+                    <strong>組み合わせでおトクなセット料金！</strong><br>
+                    浴室＋換気扇・キッチン＋換気扇の2点セットから、3点・4点・5点セットまで自動で適用されます。<br>
+                    ※セット料金は広さによって前後するため、事前にお部屋のお写真をLINEでお送りください。
                 </div>
 
                 <div id="place-list"></div>
@@ -486,7 +487,7 @@
             <div class="card">
                 <div class="result-head">
                     <p class="sec-note" style="margin-bottom:2px">お見積もり金額（概算）</p>
-                    <div class="amount"><span id="result-amount">0</span><span class="yen">円</span></div>
+                    <div class="amount"><span id="result-amount">0</span><span class="yen" id="result-yen">円</span></div>
                     <p class="tax">税込</p>
                 </div>
                 <div id="breakdown"></div>
@@ -503,6 +504,7 @@
 
             <p class="disclaimer">
                 ※ 表示金額は税込の概算です。お部屋の広さ・汚れ具合により、当日までに金額が変わる場合があります。<br>
+                ※ セット料金は広さによって前後する可能性があるため、事前にお部屋のお写真をLINEでお送りください。<br>
                 ※ 有料駐車場をご利用いただく場合は、実費のご負担をお願いしております。<br>
                 ※ 正式なお見積もりは、ご予約後の確認をもってご案内いたします。
             </p>
@@ -514,7 +516,7 @@
         <div class="bar-inner">
             <div class="bar-total">
                 <span class="label" id="bar-label">合計（税込）</span>
-                <span class="amount"><span id="bar-amount">0</span><span class="yen">円</span></span>
+                <span class="amount"><span id="bar-amount">0</span><span class="yen" id="bar-yen">円</span></span>
             </div>
             <div class="btn-row" style="margin-top:0">
                 <button class="btn btn-ghost hidden" id="btn-back" style="flex:0 0 90px">戻る</button>
@@ -544,7 +546,7 @@
             // 換気扇はタイプによって料金が違う（どちらか1つを選ぶ）
             fan: {
                 setKey: 'B',
-                label: 'キッチン換気扇クリーニング（タイプを選択）',
+                label: '換気扇クリーニング（タイプを選択）',
                 variants: [
                     { id: 'prop', name: 'プロペラ型', price: 13000, hoursText: '目安 2〜3時間' },
                     { id: 'range', name: 'レンジフード型', price: 14000, hoursText: '目安 2〜3時間' }
@@ -552,11 +554,15 @@
             },
 
             // セット料金（広さで前後するため「min〜max」の幅で見せる）
+            // max が null のセットは「25,000円〜」のような上限なし表示になる
             // three は「浴室・換気扇・キッチン」の組み合わせのときだけ適用
+            // bathFan は「浴室＋換気扇」、kitchenFan は「キッチン＋換気扇」の2点のときだけ適用
             sets: {
                 five: { name: '水回り5点セット', min: 47000, max: 50000, hoursText: '目安 8〜9時間' },
                 four: { name: '水回り4点セット', min: 42000, max: 44000, hoursText: '目安 6〜7時間' },
-                three: { name: '水回り3点セット（浴室・キッチン・換気扇）', min: 36000, max: 39000, hoursText: '目安 6〜7時間' }
+                three: { name: '水回り3点セット（浴室・キッチン・換気扇）', min: 36000, max: 39000, hoursText: '目安 6〜7時間' },
+                bathFan: { name: '浴室換気扇セット', min: 27000, max: null, hoursText: '目安 4〜5時間' },
+                kitchenFan: { name: 'キッチン換気扇セット', min: 25000, max: null, hoursText: '目安 3〜4時間' }
             },
 
             // オプション
@@ -585,9 +591,20 @@
         var $ = function (id) { return document.getElementById(id); };
         var yen = function (n) { return n.toLocaleString('ja-JP'); };
 
-        // 「36,000〜39,000」のような幅つき金額の表示文字列
-        function yenRange(min, max) {
-            return min === max ? yen(min) : yen(min) + '〜' + yen(max);
+        // 金額の表示用（数字部分と「円」部分に分けて返す）
+        // max が null … 「25,000」＋「円〜」（上限なしのセット料金）
+        // min = max  … 「12,000」＋「円」
+        // それ以外   … 「36,000〜39,000」＋「円」
+        function fmtAmount(min, max) {
+            if (max === null) return { num: yen(min), suffix: '円〜' };
+            if (min === max) return { num: yen(min), suffix: '円' };
+            return { num: yen(min) + '〜' + yen(max), suffix: '円' };
+        }
+
+        // 「36,000〜39,000円」のような1つの文字列がほしいとき用
+        function yenText(min, max) {
+            var f = fmtAmount(min, max);
+            return f.num + f.suffix;
         }
 
         /* ── 集計 ───────────────── */
@@ -601,7 +618,7 @@
             if (state.fanType) {
                 PRICING.fan.variants.forEach(function (v) {
                     if (v.id === state.fanType) {
-                        list.push({ setKey: PRICING.fan.setKey, name: 'キッチン換気扇（' + v.name + '）', price: v.price });
+                        list.push({ setKey: PRICING.fan.setKey, name: '換気扇（' + v.name + '）', price: v.price });
                     }
                 });
             }
@@ -614,6 +631,8 @@
             if (places.length === 5) return PRICING.sets.five;
             if (places.length === 4) return PRICING.sets.four;
             if (keys === 'ABC') return PRICING.sets.three;
+            if (keys === 'AB') return PRICING.sets.bathFan;
+            if (keys === 'BC') return PRICING.sets.kitchenFan;
             return null;
         }
 
@@ -622,11 +641,12 @@
             var places = selectedPlaces();
             var set = detectSet(places);
             var menuLines = [], optionLines = [];
-            var min = 0, max = 0;
+            // openMax … 上限なし（「25,000円〜」表示）のセットが入っているか
+            var min = 0, max = 0, openMax = false;
 
             if (set) {
                 min += set.min;
-                max += set.max;
+                if (set.max === null) { openMax = true; } else { max += set.max; }
                 menuLines.push({ name: set.name, min: set.min, max: set.max });
             } else {
                 places.forEach(function (p) {
@@ -649,7 +669,7 @@
                 set: set,
                 setPlaces: set ? places : null,
                 min: min,
-                max: max,
+                max: openMax ? null : max,
                 count: places.length
             };
         }
@@ -719,7 +739,7 @@
 
                     PRICING.fan.variants.forEach(function (v) {
                         list.appendChild(buildToggleRow({
-                            name: 'キッチン換気扇（' + v.name + '）',
+                            name: '換気扇（' + v.name + '）',
                             meta: v.hoursText,
                             price: v.price,
                             on: state.fanType === v.id,
@@ -746,7 +766,7 @@
                 return;
             }
             banner.classList.remove('hidden');
-            banner.textContent = '🎉 ' + r.set.name + 'が適用されます！ ' + yenRange(r.set.min, r.set.max) + '円（' + r.set.hoursText + '）';
+            banner.textContent = '🎉 ' + r.set.name + 'が適用されます！ ' + yenText(r.set.min, r.set.max) + '（' + r.set.hoursText + '）';
         }
 
         function renderOptions() {
@@ -781,7 +801,9 @@
 
         function updateBar() {
             var r = calc();
-            $('bar-amount').textContent = yenRange(r.min, r.max);
+            var f = fmtAmount(r.min, r.max);
+            $('bar-amount').textContent = f.num;
+            $('bar-yen').textContent = f.suffix;
 
             var next = $('btn-next');
             if (state.step === 1) {
@@ -845,14 +867,16 @@
 
         function renderResult() {
             var r = calc();
-            $('result-amount').textContent = yenRange(r.min, r.max);
+            var f = fmtAmount(r.min, r.max);
+            $('result-amount').textContent = f.num;
+            $('result-yen').textContent = f.suffix;
 
             var bd = $('breakdown');
             bd.textContent = '';
 
             addGroup(bd, 'クリーニング');
             r.menuLines.forEach(function (l) {
-                addRow(bd, l.name, yenRange(l.min, l.max) + '円');
+                addRow(bd, l.name, yenText(l.min, l.max));
             });
 
             // セット適用時は、含まれる場所の一覧も見せる
@@ -866,11 +890,11 @@
             if (r.optionLines.length) {
                 addGroup(bd, 'オプション');
                 r.optionLines.forEach(function (l) {
-                    addRow(bd, l.name, yenRange(l.min, l.max) + '円');
+                    addRow(bd, l.name, yenText(l.min, l.max));
                 });
             }
 
-            addRow(bd, '合計（税込）', yenRange(r.min, r.max) + '円', 'is-total');
+            addRow(bd, '合計（税込）', yenText(r.min, r.max), 'is-total');
         }
 
         /* ── 起動 ───────────────── */
