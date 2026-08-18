@@ -1160,9 +1160,18 @@
             return Math.round((answers[key].pts / MAX_PTS) * 100);
         }
 
-        // 4年以上クリーニングしていない／一度もしたことがない人かどうか
+        // 使用4年以上（4〜6年・7年以上）かどうか
+        function isOldUnit() {
+            return answers.years && (answers.years.value === 'y46' || answers.years.value === 'o7');
+        }
+
+        // 長期間クリーニングされていない状態かどうか
+        // ・4年以上クリーニングしていない → 該当
+        // ・一度もしたことがない → 使用4年以上のときだけ該当（使用3年以内は汚れの蓄積も浅いため除く）
         function isLongNeglect() {
-            return answers.timing && (answers.timing.value === 'o4' || answers.timing.value === 'never');
+            if (!answers.timing) return false;
+            if (answers.timing.value === 'o4') return true;
+            return answers.timing.value === 'never' && isOldUnit();
         }
 
         // お掃除おすすめ度 = 各項目の加算合計（5%〜95%の範囲で表示）
@@ -1172,14 +1181,22 @@
                 if (answers[key]) total += deductionOf(key);
             }
             let score = Math.max(5, Math.min(95, total));
-            // 4年以上お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
-            if (isLongNeglect()) score = Math.max(score, 45);
+            // 長期間お掃除していない場合、自覚症状が少なくても内部には汚れが蓄積しているため下限を設ける
+            // ・4年以上クリーニングしていない → キレイ度 最大40%
+            // ・一度もしていない＋使用4年以上 → キレイ度 最大30%
+            if (answers.timing && answers.timing.value === 'never' && isOldUnit()) score = Math.max(score, 70);
+            else if (answers.timing && answers.timing.value === 'o4') score = Math.max(score, 60);
             // ニオイ・黒い汚れ・効きの低下が複数出ている場合、
             // 使用年数などが浅くても内部に汚れがたまっているため、キレイ度に上限を設ける
             // （点数は8問の平均なので、2〜3問だけでは下がりきらない。症状の数に応じて段階的に押さえる）
             const symp = symptomCount();
             if (symp >= 3) score = Math.max(score, 62);      // キレイ度 38%以下
             else if (symp >= 2) score = Math.max(score, 50); // キレイ度 50%以下
+            // 強い汚れのサインが1つだけの場合も、キレイ度が高く表示されすぎないように上限を設ける
+            if (answers.dust && answers.dust.value === 'debris') score = Math.max(score, 75);      // 黒いカスが出る → 最大25%
+            else if (answers.dust && answers.dust.value === 'spots') score = Math.max(score, 60);  // 黒い点が見える → 最大40%
+            if (answers.smell && answers.smell.value === 'always') score = Math.max(score, 65);    // 常に臭う → 最大35%
+            if (answers.efficiency && answers.efficiency.value === 'bad') score = Math.max(score, 60); // 効きが明らかに悪い → 最大40%
             return score;
         }
 

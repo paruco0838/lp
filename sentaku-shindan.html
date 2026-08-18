@@ -1188,7 +1188,8 @@
         };
 
         // 質問を出す順番（debrisは縦型のみ・dryingはドラム式のみ。どちらか片方だけ出るので常に9問）
-        const ORDER = ['type', 'timing', 'years', 'cleaner', 'detergent', 'frequency', 'smell', 'debris', 'drying', 'habits'];
+        // タイプ → 使用年数 → 前回の分解クリーニング → その他の使用状況、の順に聞く
+        const ORDER = ['type', 'years', 'timing', 'cleaner', 'detergent', 'frequency', 'smell', 'debris', 'drying', 'habits'];
 
         // 汚れ点数の最大値（timing6 + years5 + cleaner4 + detergent3 + frequency5 + smell5 + debris/dryingどちらか5 + habits5。typeは0）
         const MAX_PTS = 38;
@@ -1225,9 +1226,14 @@
             return Math.round((answers[key].pts / MAX_PTS) * 100);
         }
 
-        // 4年以上分解クリーニングしていない／一度もしたことがない人かどうか
+        // 4年以上分解クリーニングしていない／一度もしたことがない人かどうか（おすすめ判定に使う）
         function isLongNeglect() {
             return answers.timing && (answers.timing.value === 'o4' || answers.timing.value === 'never');
+        }
+
+        // 使用4年以上（4〜6年・7年以上）かどうか
+        function isOldMachine() {
+            return answers.years && (answers.years.value === 'y46' || answers.years.value === 'o7');
         }
 
         // お掃除おすすめ度 = 各項目の加算合計（5%〜95%の範囲で表示）
@@ -1237,12 +1243,20 @@
                 if (answers[key]) total += deductionOf(key);
             }
             let score = Math.max(5, Math.min(95, total));
-            // 4年以上お掃除していない場合、自覚症状が少なくても槽の裏側には汚れが蓄積しているため下限を設ける
-            if (isLongNeglect()) score = Math.max(score, 45);
-            // ニオイ・黒いカスの両方が出ている場合、
+            // 長期間お掃除していない場合、自覚症状が少なくても槽の裏側には汚れが蓄積しているため下限を設ける
+            // ・4年以上分解クリーニングしていない → キレイ度 最大40%
+            // ・一度もしていない＋使用4年以上 → キレイ度 最大30%（使用3年以内には適用しない）
+            if (answers.timing && answers.timing.value === 'never' && isOldMachine()) score = Math.max(score, 70);
+            else if (answers.timing && answers.timing.value === 'o4') score = Math.max(score, 60);
+            // ニオイ・黒いカス・乾燥低下のサインが2つ出ている場合、
             // 使用年数などが浅くても槽の裏側に汚れがたまっているため、キレイ度に上限を設ける
             const symp = symptomCount();
             if (symp >= 2) score = Math.max(score, 50); // キレイ度 50%以下
+            // 強い汚れのサインが1つだけの場合も、キレイ度が高く表示されすぎないように上限を設ける
+            if (answers.debris && answers.debris.value === 'often') score = Math.max(score, 75);         // よく付く → 最大25%
+            else if (answers.debris && answers.debris.value === 'sometimes') score = Math.max(score, 60); // たまに付く → 最大40%
+            if (answers.smell && answers.smell.value === 'always') score = Math.max(score, 65);           // いつも気になる → 最大35%
+            if (isDryingBad()) score = Math.max(score, 60);                                               // 乾燥が明らかに低下 → 最大40%
             return score;
         }
 
